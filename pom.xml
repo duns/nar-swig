@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <groupId>org.swig</groupId>
-  <artifactId>swig</artifactId>
+  <artifactId>nar-swig</artifactId>
   <packaging>nar</packaging>
 
   <name>SWIG</name>
