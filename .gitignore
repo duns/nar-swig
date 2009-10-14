@@ -4,6 +4,15 @@ Makefile
 .deps
 .dirstamp
 
+src/gnu/CCache/configure
+src/gnu/Source/Makefile.in
+src/gnu/Tools/config/config.guess
+src/gnu/Tools/config/config.sub
+src/gnu/Tools/config/depcomp
+src/gnu/Tools/config/install-sh
+src/gnu/Tools/config/ylwrap
+src/gnu/aclocal.m4
+src/gnu/configure
 src/gnu/CCache/autom4te.cache/
 src/gnu/CCache/ccache-swig
 src/gnu/CCache/ccache_swig_config.h
