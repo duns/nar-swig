@@ -1,32 +1,3 @@
 target
-*.o
-Makefile
-.deps
-.dirstamp
 
-src/gnu/CCache/configure
-src/gnu/Source/Makefile.in
-src/gnu/Tools/config/config.guess
-src/gnu/Tools/config/config.sub
-src/gnu/Tools/config/depcomp
-src/gnu/Tools/config/install-sh
-src/gnu/Tools/config/ylwrap
-src/gnu/aclocal.m4
-src/gnu/configure
-src/gnu/CCache/autom4te.cache/
-src/gnu/CCache/ccache-swig
-src/gnu/CCache/ccache_swig_config.h
-src/gnu/CCache/config.h
-src/gnu/CCache/config.log
-src/gnu/CCache/config.status
-src/gnu/Lib/ocaml/swigp4.ml
-src/gnu/Source/Include/stamp-h1
-src/gnu/Source/Include/swigconfig.h
-src/gnu/Source/eswig
-src/gnu/autom4te.cache/
-src/gnu/config.log
-src/gnu/config.status
-src/gnu/preinst-swig
-src/gnu/swig
-src/gnu/swig.spec
 
