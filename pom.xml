@@ -65,7 +65,7 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <extensions>true</extensions>
         <configuration>
-          <resourceIncludeDir>share/swig/1.3.40</resourceIncludeDir>
+          <resourceIncludeDir>src/gnu/Lib</resourceIncludeDir>
           <libraries>
             <library>
               <type>executable</type>
