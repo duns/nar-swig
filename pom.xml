@@ -92,7 +92,7 @@ under the License.
             <version>2.1-SNAPSHOT</version>
             <extensions>true</extensions>
             <configuration>
-              <resourceIncludeDir>src/gnu/Lib</resourceIncludeDir>
+              <resourceIncludeDir>Lib</resourceIncludeDir>
               <libraries>
                 <library>
                   <type>executable</type>
