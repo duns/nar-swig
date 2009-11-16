@@ -53,6 +53,19 @@ under the License.
     <url>http://issues.sonatype.org/browse/NAR</url>
   </issueManagement>
 
+  <distributionManagement>
+    <repository>
+      <id>duns-maven-releases</id>
+      <name>Duns' Maven Releases</name>
+      <url>file:///Users/duns/sonatype/git/maven-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>duns-maven-snapshots</id>
+      <name>Duns' Maven Snapshots</name>
+      <url>file:///Users/duns/sonatype/git/maven-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
