@@ -1,13 +1,17 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * modula3.cxx
  *
  * Modula3 language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_modula3_cxx[] = "$Id: modula3.cxx 11584 2009-08-16 00:04:29Z wsfulton $";
+char cvsroot_modula3_cxx[] = "$Id: modula3.cxx 12064 2010-05-28 22:24:11Z wsfulton $";
 
 /*
   Text formatted with
@@ -81,7 +85,7 @@ char cvsroot_modula3_cxx[] = "$Id: modula3.cxx 11584 2009-08-16 00:04:29Z wsfult
      that assign special purposes to the array types.
    - Can one interpret $n_basetype as the identifier matched with SWIGTYPE ?
 
-  Swig's odds:
+  SWIG's odds:
    - arguments of type (Node *) for SWIG functions
      should be most often better (const Node *):
      Swig_symbol_qualified, Getattr, nodeType, parentNode
@@ -966,10 +970,10 @@ MODULA3():
     Printf(f_runtime, "#define SWIGMODULA3\n");
     Printf(f_runtime, "\n");
 
-    Swig_name_register((char *) "wrapper", (char *) "Modula3_%f");
+    Swig_name_register("wrapper", "Modula3_%f");
     if (old_variable_names) {
-      Swig_name_register((char *) "set", (char *) "set_%v");
-      Swig_name_register((char *) "get", (char *) "get_%v");
+      Swig_name_register("set", "set_%n%v");
+      Swig_name_register("get", "get_%n%v");
     }
 
     Printf(f_wrappers, "\n#ifdef __cplusplus\n");
@@ -1192,7 +1196,7 @@ MODULA3():
       Swig_restore(n);
       native_function_flag = false;
     } else {
-      Printf(stderr, "%s : Line %d. No return type for %%native method %s.\n", input_file, line_number, Getattr(n, "wrap:name"));
+      Swig_error(input_file, line_number, "No return type for %%native method %s.\n", Getattr(n, "wrap:name"));
     }
 
     return SWIG_OK;
@@ -1418,7 +1422,7 @@ MODULA3():
 
       // below based on Swig_VargetToFunction()
       SwigType *ty = Swig_wrapped_var_type(Getattr(n, "type"), use_naturalvar_mode(n));
-      Setattr(n, "wrap:action", NewStringf("result = (%s) %s;", SwigType_lstr(ty, 0), Getattr(n, "value")));
+      Setattr(n, "wrap:action", NewStringf("result = (%s)(%s);", SwigType_lstr(ty, 0), Getattr(n, "value")));
     }
 
     Setattr(n, "wrap:name", wname);
@@ -2616,7 +2620,7 @@ MODULA3():
 
     if (proxy_flag) {
       String *overloaded_name = getOverloadedName(n);
-      String *intermediary_function_name = Swig_name_member(proxy_class_name, overloaded_name);
+      String *intermediary_function_name = Swig_name_member(NSPACE_TODO, proxy_class_name, overloaded_name);
       Setattr(n, "proxyfuncname", Getattr(n, "sym:name"));
       Setattr(n, "imfuncname", intermediary_function_name);
       proxyClassFunctionHandler(n);
@@ -2637,7 +2641,7 @@ MODULA3():
 
     if (proxy_flag) {
       String *overloaded_name = getOverloadedName(n);
-      String *intermediary_function_name = Swig_name_member(proxy_class_name, overloaded_name);
+      String *intermediary_function_name = Swig_name_member(NSPACE_TODO, proxy_class_name, overloaded_name);
       Setattr(n, "proxyfuncname", Getattr(n, "sym:name"));
       Setattr(n, "imfuncname", intermediary_function_name);
       proxyClassFunctionHandler(n);
@@ -2695,7 +2699,7 @@ MODULA3():
 
     if (proxy_flag && wrapping_member_flag && !enum_constant_flag) {
       // Properties
-      setter_flag = (Cmp(Getattr(n, "sym:name"), Swig_name_set(Swig_name_member(proxy_class_name, variable_name)))
+      setter_flag = (Cmp(Getattr(n, "sym:name"), Swig_name_set(NSPACE_TODO, Swig_name_member(NSPACE_TODO, proxy_class_name, variable_name)))
 		     == 0);
     }
 
@@ -2840,7 +2844,7 @@ MODULA3():
       String *imcall = NewString("");
 
       Printf(proxy_class_code, "  %s %s(", Getattr(n, "feature:modula3:methodmodifiers"), proxy_class_name);
-      Printv(imcall, " : this(", m3raw_name, ".", Swig_name_construct(overloaded_name), "(", NIL);
+      Printv(imcall, " : this(", m3raw_name, ".", Swig_name_construct(NSPACE_TODO, overloaded_name), "(", NIL);
 
       /* Attach the non-standard typemaps to the parameter list */
       Swig_typemap_attach_parms("in", l, NULL);
@@ -2931,7 +2935,7 @@ MODULA3():
     String *symname = Getattr(n, "sym:name");
 
     if (proxy_flag) {
-      Printv(destructor_call, m3raw_name, ".", Swig_name_destroy(symname), "(swigCPtr)", NIL);
+      Printv(destructor_call, m3raw_name, ".", Swig_name_destroy(NSPACE_TODO, symname), "(swigCPtr)", NIL);
     }
     return SWIG_OK;
   }

@@ -1,6 +1,10 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * scanner.c
  *
@@ -11,7 +15,7 @@
  * C identifiers up into keywords and SWIG directives.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_cscanner_c[] = "$Id: cscanner.c 11123 2009-02-08 22:30:10Z wsfulton $";
+char cvsroot_cscanner_c[] = "$Id: cscanner.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "cparse.h"
 #include "parser.h"
@@ -135,7 +139,7 @@ static void scanner_locator(String *loc) {
 	  break;
 	Putc(c, fn);
       }
-      /*  Printf(stderr,"location: %s:%d\n",cparse_file,cparse_line); */
+      /*  Swig_diagnostic(cparse_file, cparse_line, "Scanner_set_location\n"); */
       Scanner_set_location(scan,cparse_file,cparse_line);
       Delete(fn);
     }
@@ -257,7 +261,7 @@ void skip_decl(void) {
  * Lexical scanner.
  * ------------------------------------------------------------------------- */
 
-int yylook(void) {
+static int yylook(void) {
 
   int tok = 0;
 
@@ -410,6 +414,9 @@ int yylook(void) {
     case SWIG_TOKEN_FLOAT:
       return NUM_FLOAT;
       
+    case SWIG_TOKEN_BOOL:
+      return NUM_BOOL;
+      
     case SWIG_TOKEN_POUND:
       Scanner_skip_line(scan);
       yylval.id = Swig_copy_string(Char(Scanner_text(scan)));
@@ -499,7 +506,7 @@ int yylex(void) {
 
   l = yylook();
 
-  /*   Printf(stdout, "%s:%d:::%d: '%s'\n", cparse_file, cparse_line, l, Scanner_text(scan)); */
+  /*   Swig_diagnostic(cparse_file, cparse_line, ":::%d: '%s'\n", l, Scanner_text(scan)); */
 
   if (l == NONID) {
     last_id = 1;
@@ -525,6 +532,7 @@ int yylex(void) {
   case NUM_UNSIGNED:
   case NUM_LONGLONG:
   case NUM_ULONGLONG:
+  case NUM_BOOL:
     if (l == NUM_INT)
       yylval.dtype.type = T_INT;
     if (l == NUM_FLOAT)
@@ -539,6 +547,8 @@ int yylex(void) {
       yylval.dtype.type = T_LONGLONG;
     if (l == NUM_ULONGLONG)
       yylval.dtype.type = T_ULONGLONG;
+    if (l == NUM_BOOL)
+      yylval.dtype.type = T_BOOL;
     yylval.dtype.val = NewString(Scanner_text(scan));
     yylval.dtype.bitfield = 0;
     yylval.dtype.throws = 0;

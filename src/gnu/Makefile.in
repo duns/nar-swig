@@ -1,5 +1,5 @@
 #######################################################################
-# $Id: Makefile.in 11602 2009-08-17 01:10:04Z wsfulton $
+# SWIG top level Makefile
 #######################################################################
 
 .PHONY: ccache source swig
@@ -184,50 +184,6 @@ java.actionexample:
 	  (cd Examples/$(LANGUAGE)/java && $(MAKE) -s $(chk-set-env) $(ACTION)) \
 	fi
 
-gifplot-library:
-	@echo $(ACTION)ing Examples/GIFPlot/Lib
-	@cd Examples/GIFPlot/Lib && $(MAKE) -k -s $(ACTION)
-
-check-gifplot:					\
-	check-tcl-gifplot			\
-	check-perl5-gifplot			\
-	check-python-gifplot			\
-	check-java-gifplot			\
-	check-guile-gifplot			\
-	check-mzscheme-gifplot			\
-	check-ruby-gifplot			\
-	check-ocaml-gifplot			\
-	check-octave-gifplot			\
-	check-php-gifplot			\
-	check-pike-gifplot			\
-	check-chicken-gifplot                   \
-#	check-lua-gifplot                  	\
-#	check-csharp-gifplot                    \
-#	check-modula3-gifplot
-
-check-%-gifplot: gifplot-library
-	@if test -z "$(skip-$*)"; then				\
-	  echo $* unknown;					\
-	  exit 1;						\
-	fi
-	@passed=true;						\
-	up=`$(srcdir)/Tools/capitalize $*`;			\
-	dir="Examples/GIFPlot/$$up";				\
-	if $(skip-$*); then					\
-	  echo skipping $$up $(ACTION);				\
-	elif [ ! -f $$dir/check.list ]; then			\
-	  echo skipping $$up $(ACTION) "(no $$dir/check.list)";	\
-	else							\
-	  all=`sed '/^#/d' $$dir/check.list`;			\
-	  for a in $$all; do					\
-	    echo $(ACTION)ing $$dir/$$a;			\
-	    (cd $$dir/$$a &&					\
-	    $(MAKE) -k -s $(chk-set-env) $(ACTION))		\
-	    || passed=false;					\
-	  done;							\
-	fi;							\
-	test $$passed = true
-
 # Checks testcases in the test-suite excluding those which are known to be broken
 check-test-suite:				\
 	check-tcl-test-suite			\
@@ -277,7 +233,7 @@ partialcheck-test-suite:
 partialcheck-%-test-suite:
 	@$(MAKE) -k -s check-$*-test-suite ACTION=partialcheck NOSKIP=1
 
-check: check-aliveness check-ccache check-examples check-gifplot check-test-suite
+check: check-aliveness check-ccache check-examples check-test-suite
 
 # Run known-to-be-broken as well as not broken testcases in the test-suite
 all-test-suite:					\
@@ -337,7 +293,7 @@ broken-%-test-suite:
 # CLEAN
 #####################################################################
 
-clean: clean-objects clean-libfiles clean-examples clean-gifplot clean-test-suite clean-docs
+clean: clean-objects clean-examples clean-test-suite
 
 clean-objects: clean-source clean-ccache
 
@@ -346,14 +302,8 @@ clean-source:
 	@cd $(SOURCE) && $(MAKE) -s clean
 	@rm -f $(TARGET)
 
-clean-libfiles:
-	@rm -f $(srcdir)/Lib/swigwarn.swg
-
 clean-examples:
 	@$(MAKE) -k -s check-examples ACTION=clean
-
-clean-gifplot:
-	@$(MAKE) -k -s check-gifplot ACTION=clean
 
 clean-test-suite:
 	@$(MAKE) -k -s check-test-suite ACTION=clean NOSKIP=1
@@ -364,33 +314,18 @@ clean-%-examples:
 clean-%-test-suite:
 	@$(MAKE) -k -s check-$*-test-suite ACTION=clean NOSKIP=1
 
-clean-%-gifplot:
-	@$(MAKE) -k -s check-$*-gifplot ACTION=clean
-
 clean-ccache:
 	test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) -s clean)
 
-clean-docs: clean-docs-main clean-docs-ccache
-
-clean-docs-main:
-	@echo cleaning Docs
-	@test -d $(DOCS) || exit 0; cd $(DOCS) && $(MAKE) clean
-
-clean-docs-ccache:
-	@# Use distclean-docs-ccache, else a user requires the yodl tools to generate the docs after a clean
-
-maintainer-clean: clean-libfiles
-	@cd $(SOURCE) && $(MAKE) maintainer-clean
-
 #####################################################################
-# DISTCLEAN
+# DISTCLEAN - clean what configure built
 #####################################################################
 
-DISTCLEAN-DEAD = config.status config.log config.cache swig.spec Makefile mkmf.log libtool
+DISTCLEAN-DEAD = config.status config.log config.cache swig.spec Makefile mkmf.log libtool preinst-swig Lib/ocaml/swigp4.ml
 
-distclean: distclean-objects clean-examples clean-gifplot distclean-test-suite clean-docs distclean-dead distclean-ccache
+distclean-helper: distclean-test-suite distclean-examples distclean-dead
 
-distclean-objects: distclean-source
+distclean: distclean-source distclean-ccache distclean-helper
 
 distclean-source:
 	@echo distcleaning Source
@@ -401,14 +336,35 @@ distclean-test-suite:
 	@echo distcleaning Examples/test-suite
 	@$(MAKE) -k -s check-test-suite ACTION=distclean NOSKIP=1
 
-distclean-ccache:
-	test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) -s distclean)
+distclean-examples:
+	@echo distcleaning Examples
+	@$(MAKE) -k -s clean-examples
+	@cd Examples && $(MAKE) -k -s distclean
 
-distclean-docs-ccache:
-	@test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) distclean-docs)
+distclean-ccache:
+	@test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) -s distclean)
 
 distclean-dead:
 	rm -f $(DISTCLEAN-DEAD)
+	rm -rf autom4te.cache
+
+#####################################################################
+# MAINTAINER CLEAN - clean what the maintainer builds and ships in
+# the distributed tarball - should not delete anything needed to run
+# ./configure && make
+#####################################################################
+
+maintainer-clean:
+	@echo maintainer-cleaning source
+	@cd $(SOURCE) && $(MAKE) -k -s maintainer-clean
+	@echo maintainer-cleaning CCache
+	@test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) -s maintainer-clean)
+	@echo maintainer-cleaning docs
+	@cd $(DOCS) && $(MAKE) -k -s maintainer-clean
+	@echo maintainer-cleaning Lib files
+	@rm -f $(srcdir)/Lib/swigwarn.swg
+	@echo distcleaning
+	@$(MAKE) -k -s distclean-helper
 
 #####################################################################
 # Update the Lib/swigwarn.swg file
@@ -480,7 +436,7 @@ install-lib:
 	done
 
 install-ccache:
-	test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) install)
+	@test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) -s install)
 
 
 #####################################################################

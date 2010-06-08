@@ -1,257 +1,664 @@
-Version 1.3.40 (18 August 2009)
-===============================
+Version 2.0.0 (2 June 2010)
+===========================
 
-2009-08-17: olly
-	    [Perl] Add "#undef do_exec" to our clean up of Perl global
-	    namespace pollution.
+See CHANGES file for changes in older releases.
+See RELEASENOTES file for a summary of changes in each release.
 
-2009-08-17: olly
-	    [PHP] Fix to wrap a resource returned by __get() in a PHP object (SF#2549217).
+2010-06-02: wsfulton
+            [C#] Fix SWIG_STD_VECTOR_ENHANCED macro used in std::vector to work with
+            types containing commas, for example:
 
-2009-08-17: wsfulton
-            Fix #2797485 After doing a 'make clean', install fails if yodl2man or yodl2html 
-            is not available.
+              SWIG_STD_VECTOR_ENHANCED(std::pair< double, std::string >)
 
-2009-08-16: wsfulton
-            [Octave] Caught exceptions display the type of the C++ exception instead of the
-            generic "c++-side threw an exception" message.
+2010-06-01: wsfulton
+            Add in std_shared_ptr.i for wrapping std::shared_ptr. Requires the %shared_ptr
+            macro like in the boost_shared_ptr.i library. std::tr1::shared_ptr can also be
+            wrapped if the following macro is defined:
 
-2009-08-16: wsfulton
-            [Java] When %catches is used, fix so that any classes specified in the "throws"
-            attribute of the "throws" typemap are generated into the Java method's throws clause.
+              #define SWIG_SHARED_PTR_SUBNAMESPACE tr1
+              %include <std_shared_ptr.i>
 
-2009-08-16: wsfulton
-            [C#] Fix exception handling when %catches is used, reported by Juan Manuel Alvarez.
+            shared_ptr is also documented in Library.html now.
 
-2009-08-15: wsfulton
-            Fix %template seg fault on some cases of overloading the templated method.
-            Bug reported by Jan Kupec.
+2010-05-27: wsfulton
+            Add the ability for $typemap special variable macros to call other $typemap
+            special variable macros, for example:
 
-2009-08-15: wsfulton
-	    [Ruby] Add numerous missing wrapped methods for std::vector<bool> specialization
-            as reported by Youssef Jones.
+              %typemap(cstype) CC "CC"
+              %typemap(cstype) BB "$typemap(cstype, CC)"
+              %typemap(cstype) AA "$typemap(cstype, BB)"
+              void hah(AA aa);
 
-2009-08-14: wsfulton
-	    [Perl] Add SWIG_ConvertPtrAndOwn() method into the runtime for smart pointer 
-            memory ownership control. shared_ptr support still to be added. Patch from 
-            David Fletcher.
+            This also fixes C# std::vector containers of shared_ptr and %shared_ptr.
 
-2009-08-14: olly
-	    [PHP] PHP5 now wraps static member variables as documented.
+            Also added diagnostics for $typemap with -debug-tmsearch, for example, the
+            above displays additional diagnostic lines starting "Containing: ":
 
-2009-08-14: olly
-	    [PHP] Update the PHP "class" example to work with PHP5 and use
-	    modern wrapping features.
+              example.i:34: Searching for a suitable 'cstype' typemap for: AA aa
+                Looking for: AA aa
+                Looking for: AA
+                Using: %typemap(cstype) AA
+                Containing: $typemap(cstype, BB)
+              example.i:31: Searching for a suitable 'cstype' typemap for: BB
+                Looking for: BB
+                Using: %typemap(cstype) BB
+                Containing: $typemap(cstype, CC)
+              example.i:29: Searching for a suitable 'cstype' typemap for: CC
+                Looking for: CC
+                Using: %typemap(cstype) CC
 
-2009-08-13: wsfulton
-	    [PHP] std::vector wrappers overhaul. They no longer require the 
-            specialize_std_vector() macro. Added wrappers for capacity() and reserve().
+2010-05-26: olly
+	    Fix %attribute2ref not to produce a syntax error if the last
+	    argument (AccessorMethod) is omitted.  Patch from David Piepgras
+	    in SF#2235756.
 
-2009-08-13: wsfulton
-	    [PHP] Add const reference typemaps. const reference primitive types are
-            now passed by value rather than pointer like the other target languages.
-	    Fixes SF#2524029.
+2010-05-26: olly
+	    [PHP] When using %throws or %catches, SWIG-generated PHP5 wrappers
+	    now throw PHP Exception objects instead of giving a PHP error of
+	    type E_ERROR.
 
-2009-08-08: wsfulton
-	    [Python] More user friendly AttributeError is raised when there are
-            no constructors generated for the proxy class in the event that the
-            class is abstract - the error message is now 
-            "No constructor defined - class is abstract" whereas if there are no
-            public constructors for any other reason and the class is not abstract,
-            the message remains
-            "No constructor defined".
-            [tcl] Similarly for tcl when using -itcl.
+	    This change shouldn't cause incompatibility issues, since you can't
+	    set an error handler for E_ERROR, so previously PHP would just exit
+	    which also happens for unhandled exceptions.  The benefit is you can
+	    now catch them if you want to.
 
-2009-08-04: olly
-	    [PHP] Fix generated code to work with PHP 5.3.
+	    Fixes SF#2545578 and SF#2955522.
 
-2009-08-04: vmiklos
-            [PHP] Various mathematical functions (which would conflict
-            with the built-in PHP ones) are now automatically handled by
-            adding a 'c_' prefix.
+2010-05-25: olly
+	    [PHP] Add missing directorin typemap for const std::string &.
+	    Fixes SF#3006404 reported by t-Legiaw.
 
-2009-08-03: wsfulton
-            [C#] The std::vector<T> implementation is improved and now uses $typemap such
-            that the proxy class for T no longer has to be specified in some macros
-            for correct C# compilation; the following macros are deprecated, where
-            CSTYPE was the C# type for the C++ class CTYPE:
+2010-05-23: wsfulton
+            [C#] Fix #2957375 - SWIGStringHelper and SWIGExceptionHelper not always being
+            initialized before use in .NET 4 as the classes were not marked beforefieldinit.
+            A static constructor has been added to the intermediary class like this:
 
-            SWIG_STD_VECTOR_SPECIALIZE_MINIMUM(CSTYPE, CTYPE)
-              usage should be removed altogether
+              %pragma(csharp) imclasscode=%{
+                static $imclassname() {
+                }
+              %}
 
-            SWIG_STD_VECTOR_SPECIALIZE(CSTYPE, CTYPE)
-              should be replaced with:
-            SWIG_STD_VECTOR_ENHANCED(CTYPE)
+            If you had added your own custom static constructor to the intermediary class in
+            the same way as above, you will have to modify your approach to use static variable
+            initialization or define SWIG_CSHARP_NO_IMCLASS_STATIC_CONSTRUCTOR - See csharphead.swg.
 
-            Some more details in csharp/std_vector.i
+	    *** POTENTIAL INCOMPATIBILITY ***
+
+2010-05-23: wsfulton
+            Fix #2408232. Improve shared_ptr and intrusive_ptr wrappers for classes in an
+            inheritance hierarchy. No special treatment is needed for derived classes.
+            The proxy class also no longer needs to be specified, it is automatically
+            deduced. The following macros are deprecated:
+              SWIG_SHARED_PTR(PROXYCLASS, TYPE)
+              SWIG_SHARED_PTR_DERIVED(PROXYCLASS, BASECLASSTYPE, TYPE)
+            and have been replaced by
+              %shared_ptr(TYPE)
+            Similarly for intrusive_ptr wrappers, the following macro is deprecated:
+              SWIG_INTRUSIVE_PTR(PROXYCLASS, TYPE)
+              SWIG_INTRUSIVE_PTR_DERIVED(PROXYCLASS, BASECLASSTYPE, TYPE)
+            and have been replaced by
+              %intrusive_ptr(TYPE)
+
+2010-05-21: olly
+	    [PHP] Stop generating a bogus line of code in certain constructors.
+	    This was mostly harmless, but caused a PHP notice to be issued, if
+	    enabled (SF#2985684).
+
+2010-05-18: wsfulton
+            [Java] Fix member pointers on 64 bit platforms.
+
+2010-05-14: wsfulton
+            Fix wrapping of C++ enum boolean values reported by Torsten Landschoff:
+              typedef enum { PLAY = true, STOP = false } play_state;
+
+2010-05-14: olly
+	    [PHP] Fix wrapping of global variables which was producing
+	    uncompilable code in some cases.
+
+2010-05-12: drjoe
+	    [R] Add two more changes from Wil Nolan.  Get garbage
+	    collection to work.  Implement newfree
+
+2010-05-09: drjoe
+            Fix bug reported by Wil Nolan change creation of string so
+            that R 2.7.0+ can use char hashes
+
+2010-05-07: wsfulton
+            Apply patch #2955146 from Sergey Satskiy to fix expressions containing divide by
+            operator in constructor initialization lists.
+
+2010-05-05: wsfulton
+            [R] Memory leak fix handling const std::string & inputs, reported by Will Nolan.
+
+2010-05-01: wsfulton
+            Typemap matching enhancement for non-default typemaps. Previously all
+            qualifiers were stripped in one step, now they are stripped one at a time
+            starting with the left most qualifier. For example, int const*const 
+            is first stripped to int *const then int *.
+
+	    *** POTENTIAL INCOMPATIBILITY ***
+
+2010-04-25: bhy
+            [Python] Fix #2985655 - broken constructor renaming.
+
+2010-04-14: wsfulton
+            Typemap fragments are now official and documented in Typemaps.html.
+
+2010-04-09: wsfulton
+            [Ruby] Fix #2048064 and #2408020.
+            Apply Ubuntu patch to fix Ruby and std::vector wrappers with -minherit.
+            https://bugs.launchpad.net/ubuntu/+source/swig1.3/+bug/522874
+
+2010-04-09: wsfulton
+            [Mzscheme] Apply Ubuntu patch to fix std::map wrappers:
+            https://bugs.launchpad.net/ubuntu/+source/swig1.3/+bug/203876
+
+2010-04-09: wsfulton
+            [Python] Apply patch #2952374 - fix directors and the -nortti option.
+
+2010-04-09: wsfulton
+            [Lua] Fix #2887254 and #2946032 - SWIG_Lua_typename using wrong stack index.
+
+2010-04-03: wsfulton
+            [Python] Fix exceptions being thrown with the -threads option based on patch from Arto Vuori.
+            Fixes bug #2818499.
+
+2010-04-03: wsfulton
+            Fix Makefile targets: distclean and maintainer-clean
+
+2010-04-02: wsfulton
+            [Lua] Fix char pointers, wchar_t pointers and char arrays so that nil can be passed as a
+            valid value. Bug reported by Gedalia Pasternak.
+
+2010-04-01: wsfulton
+            Numerous subtle typemap matching rule fixes when using the default type. The typemap
+            matching rules are to take a type and find the best default typemap (SWIGTYPE, SWIGTYPE* etc),
+            then look for the next best match by reducing the chosen default type. The type deduction
+            now follows C++ class template partial specialization matching rules.
+
+            Below are the set of changes made showing the default type deduction
+            along with the old reduced type and the new version of the reduced type:
+
+                   SWIGTYPE const &[ANY]
+              new: SWIGTYPE const &[]
+              old: SWIGTYPE (&)[ANY]
+
+                   SWIGTYPE *const [ANY]
+              new: SWIGTYPE const [ANY]
+              old: SWIGTYPE *[ANY]
+
+                   SWIGTYPE const *const [ANY]
+              new: SWIGTYPE *const [ANY]
+              old: SWIGTYPE const *[ANY]
+
+                   SWIGTYPE const *const &
+              new: SWIGTYPE *const &
+              old: SWIGTYPE const *&
+
+                   SWIGTYPE *const *
+              new: SWIGTYPE const *
+              old: SWIGTYPE **
+
+                   SWIGTYPE *const &
+              new: SWIGTYPE const &
+              old: SWIGTYPE *&
+
+            Additionally, a const SWIGTYPE lookup is used now for any constant type. Some examples, where
+            T is some reduced type, eg int, struct Foo:
+
+                   T const
+              new: SWIGTYPE const
+              old: SWIGTYPE
+
+                   T *const
+              new: SWIGTYPE *const
+              old: SWIGTYPE *
+
+                   T const[]
+              new: SWIGTYPE const[]
+              old: SWIGTYPE[]
+
+                   enum T const
+              new: enum SWIGTYPE const
+              old: enum SWIGTYPE
+
+                   T (*const )[]
+              new: SWIGTYPE (*const )[]
+              old: SWIGTYPE (*)[]
+
+            Reminder: the typemap matching rules can now be seen for any types being wrapped by using
+            either the -debug-tmsearch or -debug-tmused options.
+
+            In practice this leads to some subtle matching rule changes and the majority of users
+            won't notice any changes, except in the prime area of motivation for this change: Improve
+            STL containers of const pointers and passing const pointers by reference. This is fixed
+            because many of the STL containers use a type 'T const&' as parameters and when T is 
+            a const pointer, for example, 'K const*', then the full type is 'K const*const&'. This
+            means that the 'SWIGTYPE *const&' typemaps now match when T is either a non-const or
+            const pointer. Furthermore, some target languages incorrectly had 'SWIGTYPE *&' typemaps
+            when these should have been 'SWIGTYPE *const&'. These have been corrected (Java, C#, Lua, PHP).
+
+	    *** POTENTIAL INCOMPATIBILITY ***
+
+2010-03-13: wsfulton
+            [Java] Some very old deprecated pragma warnings are now errors.
+
+2010-03-13: wsfulton
+            Improve handling of file names and directories containing double/multiple path separators.
+
+2010-03-10: mutandiz (Mikel Bancroft)
+	    [allegrocl] Use fully qualified symbol name of cl::identity in emit_defun().
+
+2010-03-06: wsfulton
+            [Java] The intermediary JNI class modifiers are now public by default meaning these
+            intermediary low level functions are now accessible by default from outside any package
+            used. The proxy class pointer constructor and getCPtr() methods are also now public.
+            These are needed in order for the nspace option to work without any other mods.
+            The previous default of protected access can be restored using:
+
+              SWIG_JAVABODY_METHODS(protected, protected, SWIGTYPE)
+              %pragma(java) jniclassclassmodifiers = "class"
+
+2010-03-06: wsfulton
+            [C#] Added the nspace feature for C#. Documentation for the nspace feature is now available.
+
+2010-03-04: wsfulton
+            Added the nspace feature. This adds some improved namespace support. Currently only Java
+            is supported for target languages, where C++ namespaces are automatically translated into
+            Java packages. The feature only applies to classes,struct,unions and enums declared within
+            a namespace. Methods and variables declared in namespaces still effectively have their
+            namespaces flattened. Example usage:
+
+              %feature(nspace) Outer::Inner1::Color;
+              %feature(nspace) Outer::Inner2::Color;
+
+              namespace Outer {
+                namespace Inner1 {
+                  struct Color {
+                    ...
+                  };
+                }
+                namespace Inner2 {
+                  struct Color {
+                    ...
+                  };
+                }
+              }
+
+            For Java, the -package option is also required when using the nspace feature. Say
+            we use -package com.myco, the two classes can then be accessed as follows from Java:
+
+              com.myco.Outer.Inner1.Color and com.myco.Outer.Inner2.Color.
+
+2010-02-27: wsfulton
+            [Python] Remove -dirvtable from the optimizations included by -O as it this option
+            currently leads to memory leaks as reported by Johan Blake.
+
+2010-02-27: wsfulton
+            License code changes: SWIG Source is GPL-v3 and library code license is now clearer
+            and is provided under a very permissive license. See http://www.swig.org/legal.html.
+
+2010-02-13: wsfulton
+            [Ruby] A few fixes for compiling under ruby-1.9.x including patch from 'Nibble'.
+
+2010-02-13: wsfulton
+            [Ruby] Apply patch from Patrick Bennett to fix RARRAY_LEN and RARRAY_PTR usage for Ruby 1.9.x
+            used in various STL wrappers.
+
+2010-02-13: wsfulton
+            [C#, Java] Fix incorrect multiply defined symbol name error when an enum item
+            and class name have the same name, as reported by Nathan Krieger. Example:
+
+              class Vector {};
+              namespace Text {
+                enum Preference { Vector };
+              }
+
+            This also fixes other incorrect corner case target language symbol name clashes.
+
+2010-02-11: wsfulton
+            Add the -debug-lsymbols option for displaying the target language layer symbols.
+
+2010-02-09: wsfulton
+            Fix -MM and -MMD options on Windows. They were not omitting files in the SWIG library as
+            they should be.
+
+2010-02-08: wsfulton
+            Fix #1807329 - When Makefile dependencies are being generated using the -M family of options
+            on Windows, the file paths have been corrected to use single backslashes rather than double
+            backslashes as path separators.
+
+2010-02-06: wsfulton
+            Fix #2918902 - language specific files not being generated in correct directory on
+            Windows when using forward slashes for -o, for example:
+              swig -python -c++ -o subdirectory/theinterface_wrap.cpp subdirectory/theinterface.i
+
+2010-02-05: wsfulton
+            Fix #2894405 - assertion when using -xmlout.
+
+2010-01-28: wsfulton
+            Fix typemap matching bug when a templated type has a typemap both specialized and not
+            specialized. For example:
+
+              template<typename T> struct XX { ... };
+              %typemap(in) const XX & "..."
+              %typemap(in) const XX< int > & "..."
+
+            resulted in the 2nd typemap being applied for all T in XX< T >.
+
+2010-01-22: wsfulton
+            Fix #2933129 - typemaps not being found when the unary scope operator (::) is used to denote
+            global scope, the typemap is now used in situations like this:
+
+              struct X {};
+              %typemap(in) const X & "..."
+              void m(const ::X &);
+
+            and this:
+
+              struct X {};
+              %typemap(in) const ::X & "..."
+              void m(const X &);
+
+2010-01-20: wsfulton
+            Fix some unary scope operator (::) denoting global scope problems in the types generated
+            into the C++ layer. Previously the unary scope operator was dropped in the generated code
+            if the type had any sort of qualifier, for example when using pointers, references, like
+            ::foo*, ::foo&, bar< ::foo* >.
+
+2010-01-13: olly
+	    [PHP] Add datetime to the list of PHP predefined classes (patch
+	    from David Fletcher in SF#2931042).
+
+2010-01-11: wsfulton
+            Slight change to warning, error and diagnostic reporting. The warning number is no 
+            longer shown within brackets. This is to help default parsing of warning messages by
+            other tools, vim on Unix in particular.
+
+            Example original display using -Fstandard:
+              example.i:20: Warning(401): Nothing known about base class 'B'. Ignored.
+            New display:
+              example.i:20: Warning 401: Nothing known about base class 'B'. Ignored.
+
+            Also subtle fix to -Fmicrosoft format adding in missing space. Example original display:
+              example.i(20): Warning(401): Nothing known about base class 'Base'. Ignored.
+            New display:
+              example.i(20) : Warning 401: Nothing known about base class 'Base'. Ignored.
+
+2010-01-10: wsfulton
+            Fix a few inconsistencies in reporting of file/line numberings including modifying
+            the overload warnings 509, 512, 516, 474, 475 to now be two line warnings.
+
+2010-01-10: wsfulton
+            Modify -debug-tags output to use standard file name/line reporting so that editors
+            can easily navigate to the appropriate lines.
+            Was typically:
+              . top . include . include (/usr/share/swig/temp/trunk/Lib/swig.swg:312)
+              . top . include . include . include (/usr/share/swig/temp/trunk/Lib/swigwarnings.swg:39)
+            now:
+              /usr/share/swig/temp/trunk/Lib/swig.swg:312:  . top . include . include
+              /usr/share/swig/temp/trunk/Lib/swigwarnings.swg:39:  . top . include . include . include
+
+2010-01-03: wsfulton
+            Fix missing file/line numbers for typemap warnings and in output from the
+           -debug-tmsearch/-debug-tmused options.
+
+2010-01-03: wsfulton
+            Add typemaps used debugging option (-debug-tmused). When used each line displays
+            the typemap used for each type for which code is being generated including the file
+            and line number related to the type. This is effectively a condensed form of the
+            -debug-tmsearch option. Documented in Typemaps.html.
+
+2009-12-23: wsfulton
+            Fix for %javaexception and directors so that all the appropriate throws clauses 
+            are generated. Problem reported by Peter Greenwood.
+
+2009-12-20: wsfulton
+            Add -debug-tmsearch option for debugging the typemap pattern matching rules.
+            Documented in Typemaps.html.
+
+2009-12-12: wsfulton
+            [Octave] Remove the -api option and use the new OCTAVE_API_VERSION_NUMBER
+            macro provided in the octave headers for determining the api version instead.
+
+2009-12-04: olly
+	    [Ruby] Improve support for Ruby 1.9 under GCC.  Addresses part of
+	    SF#2859614.
+
+2009-12-04: olly
+	    Fix handling of modulo operator (%) in constant expressions
+	    (SF#2818562).
+
+2009-12-04: olly
+	    [PHP] "empty" is a reserved word in PHP, so rename empty() method
+	    on STL classes to "is_empty()" (previously this was automatically
+	    renamed to "c_empty()").
+	    *** POTENTIAL INCOMPATIBILITY ***
+
+2009-12-03: olly
+	    [PHP] Add typemaps for long long and unsigned long long, and for
+	    pointer to method.
+
+2009-12-02: olly
+	    [PHP] Fix warning and rename of reserved class name to be case
+	    insensitive.
+
+2009-12-01: wsfulton
+            Revert support for %extend and memberin typemaps added in swig-1.3.39. The
+	    memberin typemaps are ignored again for member variables within a %extend block.
+            Documentation inconsistency reported by Torsten Landschoff.
+
+2009-11-29: wsfulton
+            [Java, C#] Fix generated quoting when using %javaconst(1)/%csconst(1) for 
+            static const char member variables.
+
+              %javaconst(1) A;
+              %csconst(1) A;
+              struct X {
+                static const char A = 'A'; 
+              };
+
+2009-11-26: wsfulton
+            [Java, C#] Fix %javaconst(1)/%csconst(1) for static const member variables to
+            use the actual constant value if it is specified, rather than the C++ code to
+            access the member.
+
+              %javaconst(1) EN;
+              %csconst(1) EN;
+              struct X {
+                static const int EN = 2;
+              };
+
+2009-11-23: wsfulton
+            C++ nested typedef classes can now be handled too, for example:
+              struct Outer {
+                typedef Foo { } FooTypedef1, FooTypedef2;
+              };
+
+2009-11-18: wsfulton
+            The wrappers for C nested structs are now generated in the same order as declared 
+            in the parsed code.
+
+2009-11-18: wsfulton
+            Fix #491476 - multiple declarations of nested structs, for example:
+              struct Outer {
+                struct {
+                  int val;
+                } inner1, inner2, *inner3, inner4[1];
+              } outer;
+
+2009-11-17: wsfulton
+            Fix parsing of enum declaration and initialization, for example:
+
+              enum ABC {
+                a,
+                b,
+                c
+              } A = a, *pC = &C, array[3] = {a, b, c};
+
+2009-11-17: wsfulton
+            Fix parsing of struct declaration and initialization, for example:
+
+              struct S {
+                 int x;
+              } instance = { 10 };
+
+2009-11-15: wsfulton
+            Fix #1960977 - Syntax error parsing derived nested class declaration and member
+            variable instance.
+
+2009-11-14: wsfulton
+            Fix #2310483 - function pointer typedef within extern "C" block.
+
+2009-11-13: wsfulton
+            Fix usage of nested template classes within templated classes so that compileable code 
+            is generated.
+
+2009-11-13: olly
+	    [php] Fix place where class prefix (as specified with -prefix)
+	    wasn't being used.  Patch from gverbruggen in SF#2892647.
+
+2009-11-12: wsfulton
+            Fix usage of nested template classes so that compileable code is generated - the nested
+            template class is now treated like a normal nested classes, that is, as an opaque type
+            unless the nestedworkaround feature is used.
+
+2009-11-12: wsfulton
+            Replace SWIGWARN_PARSE_NESTED_CLASS with SWIGWARN_PARSE_NAMED_NESTED_CLASS and
+            SWIGWARN_PARSE_UNNAMED_NESTED_CLASS for named and unnamed nested classes respectively.
+
+            Named nested class ignored warnings can now be suppressed by name using %warnfilter, eg:
+
+              %warnfilter(SWIGWARN_PARSE_NAMED_NESTED_CLASS) Outer::Inner;
+
+            but clearly unnamed nested classes cannot and the global suppression is still required, eg:
+
+              #pragma SWIG nowarn=SWIGWARN_PARSE_UNNAMED_NESTED_CLASS
+
+2009-11-11: wsfulton
+            Added the nestedworkaround feature as a way to use the full functionality of a nested class 
+            (C++ mode only). It removes the nested class from SWIG's type information so it is as if SWIG
+            had never parsed the nested class. The documented nested class workarounds using a global
+            fake class stopped working when SWIG treated the nested class as an opaque pointer, and
+            this feature reverts this behaviour. The documentation has been updated with details of how
+            to use and implement it, see the "Nested classes" section in SWIGPlus.html.
+
+2009-11-11: wsfulton
+            There were a number of C++ cases where nested classes/structs/unions were being handled
+            as if C code was being parsed which would oftentimes lead to uncompileable code as an
+            attempt was made to wrap the nested structs like it is documented for C code. Now all
+            nested structs/classes/unions are ignored in C++ mode, as was always documented. However,
+            there is an improvement as usage of nested structs/classes/unions is now always treated
+            as an opaque type by default, resulting in generated code that should always compile.
 
             *** POTENTIAL INCOMPATIBILITY ***
 
-2009-07-31: olly
-	    [Python] Fix indentation so that we give a useful error if the
-	    module can't be loaded.  Patch from Gaetan Lehmann in SF#2829853.
+2009-11-09: drjoe
+	    Fix R for -fcompact and add std_map.i
 
-2009-07-29: wsfulton
-            Add $typemap(method, typelist) special variable macro. This allows
-            the contents of a typemap to be inserted within another typemap.
-            Fully documented in Typemaps.html.
+2009-11-08: wsfulton
+            Fix inconsistency for nested structs/unions/classes. Uncompileable code was being
+            generated when inner struct and union declarations were used as types within the
+            inner struct. The inner struct/union is now treated as a forward declaration making the
+            behaviour the same as an inner class. (C++ code), eg:
 
-2009-07-29: vmiklos
-            [PHP] Static member variables are now prefixed with the
-            class name. This allows static member variables with the
-            same name in different classes.
+              struct Outer {
+                struct InnerStruct { int x; };
+                InnerStruct* getInnerStruct();
+              };
 
-2009-07-29: olly
-	    [Python] Add missing locks to std::map wrappers.  Patch from 
-	    Paul Hampson in SF#2813836.
+2009-11-08: wsfulton
+	    Ignored nested class/struct warnings now display the name of the ignored class/struct.
 
-2009-07-29: olly
-	    [PHP] Fix memory leak in PHP OUTPUT typemaps.  Reported by Hitoshi
-	    Amano in SF#2826322.
+2009-11-07: wsfulton
+	    Bug #1514681 - Fix nested template classes within a namespace generated uncompileable
+            code and introduced strange side effects to other wrapper code especially code
+            after the nested template class. Note that nested template classes are still ignored.
 
-2009-07-29: olly
-	    [PHP] Fix memory leak in PHP resource destructor for classes
-	    without a destructor and non-class types.  Patch from Hitoshi Amano
-	    in SF#2825303.
+2009-11-07: wsfulton
+	    Add new debug options:
+              -debug-symtabs    - Display symbol tables information
+              -debug-symbols    - Display target language symbols in the symbol tables
+              -debug-csymbols   - Display C symbols in the symbol tables
 
-2009-07-28: olly
-	    [PHP] Update warnings about clashes between identifiers and PHP
-	    keywords and automatic renaming to work with the PHP5 class
-	    wrappers.  Fixes SF#1613679.
+2009-11-03: wsfulton
+	    Fix some usage of unary scope operator (::) denoting global scope, for example:
 
-2009-07-28: vmiklos
-            [PHP] If a member function is not public but it has a base
-            which is public, then now a warning is issued and the member
-            function will be public, as PHP requires this.
+              namespace AA { /* ... */ }
+              using namespace ::AA;
 
-2009-07-21: vmiklos
-            [PHP] Director support added.
+            and bug #1816802 - SwigValueWrapper should be used:
 
-2009-07-15: olly
-	    [Perl] Don't specify Perl prototype "()" for a constructor with a
-	    different name to the class, as such constructors can still take
-	    parameters.
+              struct CC {
+                CC(int); // no default constructor
+              };
+              ::CC x();
 
-2009-07-12: xavier98
-	    [Octave] Add support for Octave 3.2 API
+            and in template parameter specializations:
 
-2009-07-05: olly
-	    [PHP] Update the list of PHP keywords - "cfunction" is no longer a
-	    keyword in PHP5 and PHP 5.3 added "goto", "namespace", "__DIR__",
-	    and "__NAMESPACE__".
+              struct S {};
+              template <typename T> struct X { void a() {}; };
+              template <> struct X<S> { void b() {}; };
+              %template(MyTConcrete) X< ::S >;
 
-2009-07-03: olly
-	    [Tcl] To complement USE_TCL_STUBS, add support for USE_TK_STUBS
-	    and SWIG_TCL_STUBS_VERSION.  Document all three in the Tcl chapter
-	    of the manual.  Based on patch from SF#2810380 by Christian
-	    Gollwitzer.
+            plus probably some other corner case usage of ::.
 
-2009-07-02: vmiklos
-            [PHP] Added factory.i for PHP, see the li_factory testcase
-            for more info on how to use it.
+2009-11-02: olly
+	    [Python] Fix potential memory leak in initialisation code for the
+	    generated module.
 
-2009-07-02: wsfulton
-            Fix -Wallkw option as reported by Solomon Gibbs.
+2009-10-23: wsfulton
+	    Fix seg fault when using a named nested template instantiation using %template(name) 
+            within a class. A warning that these are not supported is now issued plus processing 
+            continues as if no name was given.
 
-2009-07-02: wsfulton
-            Fix syntax error when a nested struct contains a comment containing a * followed 
-            eventually by a /. Regression from 1.3.37, reported by Solomon Gibbs.
+2009-10-20: wsfulton
+	    [Python] Fix std::vector<const T*>. This would previously compile, but not run correctly.
 
-2009-07-01: vmiklos
-            [PHP] Unknown properties are no longer ignored in proxy
-            classes.
+2009-10-20: wsfulton
+	    Fixed previously fairly poor template partial specialization and explicit 
+            specialization support. Numerous bugs in this area have been fixed including:
 
-2009-07-01: vmiklos
-            [PHP] Fixed %newobject behaviour, previously any method
-            marked with %newobject was handled as a constructor.
+            - Template argument deduction implemented for template type arguments, eg this now
+              works:
+                template<typename T> class X      {};
+                template<typename T> class X<T *> {};
+                %template(X1) X<const int *>; // Chooses T * specialization
 
-2009-06-30: olly
-	    [Ruby] Undefine close and connect macros defined by Ruby API
-	    headers as we don't need them and they can clash with C++ methods
-	    being wrapped.  Patch from Vit Ondruch in SF#2814430.
+              and more complex cases with multiple parameters and a mix of template argument
+              deduction and explicitly specialised parameters, eg:
+                template <typename T1, typename T2> struct TwoParm               { void a() {} };
+                template <typename T1>              struct TwoParm<T1 *, int *>  { void e() {} };
+                %template(E) TwoParm<int **, int *>;
 
-2009-06-26: olly
-	    [Ruby] Fix to handle FIXNUM values greater than MAXINT passed for a
-	    double parameter.
-
-2009-06-24: wsfulton
-            Fix wrapping methods with default arguments and the compactdefaultargs feature 
-            where a class is passed by value and is assigned a default value. The SwigValueWrapper
-            template workaround for a missing default constructor is no longer used as the code 
-            generated does not call the default constructor.
-
-2009-06-16: wsfulton
-	    [Java,C#] Fix enum marshalling when %ignore is used on one of the enum items.
-            Incorrect enum values were being passed to the C++ layer or compilation errors resulted.
-
-2009-06-02: talby
-	    [Perl] Resolved reference.i overload support problem
-	    identified by John Potowsky.
-
-2009-05-26: wsfulton
-	    [C#] Improved std::map wrappers based on patch from Yuval Baror. The C# proxy
-            now implements System.Collections.Generic.IDictionary<>.
-
-	    These std:map wrappers have a non-backwards compatible overhaul to make them
-            like a .NET IDictionary. Some method names have changed as following:
-              set -> setitem (use this[] property now)
-              get -> getitem (use this[] property now)
-              has_key -> ContainsKey
-              del -> Remove
-              clear -> Clear
-
-            The following macros used for std::map wrappers are deprecated and will no longer work:
-              specialize_std_map_on_key
-              specialize_std_map_on_value
-              specialize_std_map_on_both
+            Note that the primary template must now be in scope, like in C++, when
+            an explicit or partial specialization is instantiated with %template.
 
             *** POTENTIAL INCOMPATIBILITY ***
 
-2009-05-20: vmiklos
-            [PHP] Add the 'thisown' member to classes. The usage of it
-            is the same as the Python thisown one: it's 1 by default and
-            you can set it to 0 if you want to prevent freeing it. (For
-            example to prevent a double free.)
+2009-09-14: wsfulton
+	    [C#] Add %csattributes for adding C# attributes to enum values, see docs for example.
 
-2009-05-14: bhy
-            [Python] Fix the wrong pointer value returned by SwigPyObject_repr().
+2009-09-11: wsfulton
+	    Fix memmove regression in cdata.i as reported by Adriaan Renting.
 
-2009-05-13: mutandiz (Mikel Bancroft)
-	    [allegrocl] Minor tweak when wrapping in -nocwrap mode.
+2009-09-07: wsfulton
+	    Fix constant expressions containing <= or >=.
 
-2009-05-11: wsfulton
-	    [C#] Improved std::vector wrappers on the C# proxy side from Yuval Baror. These
-	    implement IList<> instead of IEnumerable<> where possible.
+2009-09-02: wsfulton
+	    The following operators in constant expressions now result in type bool for C++ 
+            wrappers and remain as type int for C wrappers, as per each standard: 
 
-2009-04-29: wsfulton
-	    [Java, C#] Add the 'notderived' attribute to the javabase and csbase typemaps.
-	    When this attribute is set, the typemap will not apply to classes that are derived
-	    from a C++ base class, eg 
-	      %typemap(csbase, notderived="1") SWIGTYPE "CommonBase"
+              && || == != < > <= >= (Actually the last 4 are still broken). For example:
 
-2009-04-29: olly
-	    [Python] Don't attempt to acquire the GIL in situations where we
-	    know that it will already be locked.  This avoids some dead-locks
-	    with mod_python (due to mod_python bugs which are apparently
-	    unlikely to ever be fixed), and results in smaller wrappers which
-	    run a little faster (in tests with Xapian on x86-64 Ubuntu 9.04,
-	    the stripped wrapper library was 11% smaller and ran 2.7% faster).
+              #define A 10
+              #define B 10
+              #define A_EQ_B  A == B // now wrapped as type bool for C++
+              #define A_AND_B A && B // now wrapped as type bool for C++
 
-2009-04-21: wsfulton
-	    [C#] Fix #2753469 - bool &OUTPUT and bool *OUTPUT typemaps initialisation.
+2009-09-02: wsfulton
+	    Fix #2845746. true and false are now recognised keywords (only when wrapping C++).
+            Constants such as the following are now wrapped (as type bool):
+              #define FOO true
+              #define BAR FOO && false
 
-2009-04-09: wsfulton
-	    Fix #2746858 - C macro expression using floating point numbers
-
-2009-03-30: olly
-	    [PHP] The default out typemap for char[ANY] now returns the string up to a
-	    zero byte, or the end of the array if there is no zero byte.  This
-	    is the same as Python does, and seems more generally useful than
-	    the previous behaviour of returning the whole contents of the array
-	    including any zero bytes.  If you want the old behaviour, you can provide
-	    your own typemap to do this:
-
-	    %typemap(out) char [ANY]
-	    %{
-		RETVAL_STRINGL($1, $1_dim0, 1);
-	    %}

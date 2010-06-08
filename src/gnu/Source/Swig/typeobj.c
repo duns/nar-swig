@@ -1,6 +1,10 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * typeobj.c
  *
@@ -10,7 +14,7 @@
  * like typedef, namespaces, etc.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_typeobj_c[] = "$Id: typeobj.c 11080 2009-01-24 13:15:51Z bhy $";
+char cvsroot_typeobj_c[] = "$Id: typeobj.c 12007 2010-05-02 21:35:02Z wsfulton $";
 
 #include "swig.h"
 #include <ctype.h>
@@ -45,6 +49,9 @@ char cvsroot_typeobj_c[] = "$Id: typeobj.c 11080 2009-01-24 13:15:51Z bhy $";
  *  'f(..,..).'         = Function with arguments  (args)
  *  'q(str).'           = Qualifier (such as const or volatile) (const, volatile)
  *  'm(qual).'          = Pointer to member (qual::*)
+ *
+ *  The complete type representation for varargs is:
+ *  'v(...)'
  *
  * The encoding follows the order that you might describe a type in words.
  * For example "p.a(200).int" is "A pointer to array of int's" and
@@ -173,6 +180,9 @@ SwigType *SwigType_del_element(SwigType *t) {
  * SwigType_pop()
  * 
  * Pop one type element off the type.
+ * Example: t in:  q(const).p.Integer
+ *          t out: p.Integer
+ *	   result: q(const).
  * ----------------------------------------------------------------------------- */
 
 SwigType *SwigType_pop(SwigType *t) {
@@ -781,13 +791,15 @@ int SwigType_isfunction(SwigType *t) {
   return 0;
 }
 
-ParmList *SwigType_function_parms(SwigType *t) {
+/* Create a list of parameters from the type t, using the file_line_node Node for 
+ * file and line numbering for the parameters */
+ParmList *SwigType_function_parms(SwigType *t, Node *file_line_node) {
   List *l = SwigType_parmlist(t);
   Hash *p, *pp = 0, *firstp = 0;
   Iterator o;
 
   for (o = First(l); o.item; o = Next(o)) {
-    p = NewParm(o.item, 0);
+    p = file_line_node ? NewParm(o.item, 0, file_line_node) : NewParmWithoutFileLineInfo(o.item, 0);
     if (!firstp)
       firstp = p;
     if (pp) {
@@ -850,11 +862,12 @@ SwigType *SwigType_add_template(SwigType *t, ParmList *parms) {
  * SwigType_templateprefix()
  *
  * Returns the prefix before the first template definition.
+ * Returns the type unmodified if not a template.
  * For example:
  *
- *     Foo<(p.int)>::bar
- *
- * returns "Foo"
+ *     Foo<(p.int)>::bar  =>  Foo
+ *     r.q(const).Foo<(p.int)>::bar => r.q(const).Foo
+ *     Foo => Foo
  * ----------------------------------------------------------------------------- */
 
 String *SwigType_templateprefix(const SwigType *t) {
@@ -893,6 +906,25 @@ String *SwigType_templatesuffix(const SwigType *t) {
     c++;
   }
   return NewStringEmpty();
+}
+
+/* -----------------------------------------------------------------------------
+ * SwigType_istemplate_templateprefix()
+ *
+ * Combines SwigType_istemplate and SwigType_templateprefix efficiently into one function.
+ * Returns the prefix before the first template definition.
+ * Returns NULL if not a template.
+ * For example:
+ *
+ *     Foo<(p.int)>::bar  =>  Foo
+ *     r.q(const).Foo<(p.int)>::bar => r.q(const).Foo
+ *     Foo => NULL
+ * ----------------------------------------------------------------------------- */
+
+String *SwigType_istemplate_templateprefix(const SwigType *t) {
+  const char *s = Char(t);
+  const char *c = strstr(s, "<(");
+  return c ? NewStringWithSize(s, c - s) : 0;
 }
 
 /* -----------------------------------------------------------------------------
@@ -1093,3 +1125,62 @@ SwigType *SwigType_strip_qualifiers(SwigType *t) {
   }
   return r;
 }
+
+/* -----------------------------------------------------------------------------
+ * SwigType_strip_single_qualifier()
+ * 
+ * If the type contains a qualifier, strip one qualifier and return a new type.
+ * The left most qualifier is stripped first (when viewed as C source code) but
+ * this is the equivalent to the right most qualifier using SwigType notation.
+ * Example: 
+ *    r.q(const).p.q(const).int => r.q(const).p.int
+ *    r.q(const).p.int          => r.p.int
+ *    r.p.int                   => r.p.int
+ * ----------------------------------------------------------------------------- */
+
+SwigType *SwigType_strip_single_qualifier(SwigType *t) {
+  static Hash *memoize_stripped = 0;
+  SwigType *r = 0;
+  List *l;
+  int numitems;
+
+  if (!memoize_stripped)
+    memoize_stripped = NewHash();
+  r = Getattr(memoize_stripped, t);
+  if (r)
+    return Copy(r);
+
+  l = SwigType_split(t);
+
+  numitems = Len(l);
+  if (numitems >= 2) {
+    int item;
+    /* iterate backwards from last but one item */
+    for (item = numitems - 2; item >= 0; --item) {
+      String *subtype = Getitem(l, item);
+      if (SwigType_isqualifier(subtype)) {
+	Iterator it;
+	Delitem(l, item);
+	r = NewStringEmpty();
+	for (it = First(l); it.item; it = Next(it)) {
+	  Append(r, it.item);
+	}
+	break;
+      }
+    }
+  }
+  if (!r)
+    r = Copy(t);
+
+  Delete(l);
+  {
+    String *key, *value;
+    key = Copy(t);
+    value = Copy(r);
+    Setattr(memoize_stripped, key, value);
+    Delete(key);
+    Delete(value);
+  }
+  return r;
+}
+

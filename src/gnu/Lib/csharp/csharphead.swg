@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * csharphead.swg
  *
  * Support code for exceptions if the SWIG_CSHARP_NO_EXCEPTION_HELPER is not defined
@@ -321,6 +318,14 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterStringCallback_$module(SWIG_CSharpString
 }
 %}
 #endif // SWIG_CSHARP_NO_STRING_HELPER
+
+#if !defined(SWIG_CSHARP_NO_IMCLASS_STATIC_CONSTRUCTOR)
+// Ensure the class is not marked beforefieldinit
+%pragma(csharp) imclasscode=%{
+  static $imclassname() {
+  }
+%}
+#endif
 
 %insert(runtime) %{
 /* Contract support */

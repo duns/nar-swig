@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * pike.cxx
  *
@@ -25,7 +29,7 @@
  *
  */
 
-char cvsroot_pike_cxx[] = "$Id: pike.cxx 11133 2009-02-20 07:52:24Z wsfulton $";
+char cvsroot_pike_cxx[] = "$Id: pike.cxx 11936 2010-03-10 22:00:14Z wsfulton $";
 
 #include "swigmod.h"
 
@@ -155,8 +159,8 @@ public:
     Printf(f_header, "#define SWIG_name    \"%s\"\n\n", module);
 
     /* Change naming scheme for constructors and destructors */
-    Swig_name_register("construct", "%c_create");
-    Swig_name_register("destroy", "%c_destroy");
+    Swig_name_register("construct", "%n%c_create");
+    Swig_name_register("destroy", "%n%c_destroy");
 
     /* Current wrap type */
     current = NO_CPP;
@@ -762,7 +766,7 @@ public:
     /* Create a function to set the values of the (mutable) variables */
     if (need_setter) {
       Wrapper *wrapper = NewWrapper();
-      String *setter = Swig_name_member(getClassPrefix(), (char *) "`->=");
+      String *setter = Swig_name_member(NSPACE_TODO, getClassPrefix(), "`->=");
       String *wname = Swig_name_wrapper(setter);
       Printv(wrapper->def, "static void ", wname, "(INT32 args) {", NIL);
       Printf(wrapper->locals, "char *name = (char *) STR0(Pike_sp[0-args].u.string);\n");
@@ -771,7 +775,7 @@ public:
       while (i.item) {
 	if (!GetFlag(i.item, "feature:immutable")) {
 	  name = Getattr(i.item, "name");
-	  funcname = Swig_name_wrapper(Swig_name_set(Swig_name_member(getClassPrefix(), name)));
+	  funcname = Swig_name_wrapper(Swig_name_set(NSPACE_TODO, Swig_name_member(NSPACE_TODO, getClassPrefix(), name)));
 	  Printf(wrapper->code, "if (!strcmp(name, \"%s\")) {\n", name);
 	  Printf(wrapper->code, "%s(args);\n", funcname);
 	  Printf(wrapper->code, "return;\n");
@@ -801,7 +805,7 @@ public:
 
     /* Create a function to get the values of the (mutable) variables */
     Wrapper *wrapper = NewWrapper();
-    String *getter = Swig_name_member(getClassPrefix(), (char *) "`->");
+    String *getter = Swig_name_member(NSPACE_TODO, getClassPrefix(), "`->");
     String *wname = Swig_name_wrapper(getter);
     Printv(wrapper->def, "static void ", wname, "(INT32 args) {", NIL);
     Printf(wrapper->locals, "char *name = (char *) STR0(Pike_sp[0-args].u.string);\n");
@@ -809,7 +813,7 @@ public:
     i = First(membervariables);
     while (i.item) {
       name = Getattr(i.item, "name");
-      funcname = Swig_name_wrapper(Swig_name_get(Swig_name_member(getClassPrefix(), name)));
+      funcname = Swig_name_wrapper(Swig_name_get(NSPACE_TODO, Swig_name_member(NSPACE_TODO, getClassPrefix(), name)));
       Printf(wrapper->code, "if (!strcmp(name, \"%s\")) {\n", name);
       Printf(wrapper->code, "%s(args);\n", funcname);
       Printf(wrapper->code, "return;\n");

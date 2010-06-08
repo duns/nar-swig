@@ -1,18 +1,31 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * misc.c
  *
  * Miscellaneous functions that don't really fit anywhere else.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_misc_c[] = "$Id: misc.c 11133 2009-02-20 07:52:24Z wsfulton $";
+char cvsroot_misc_c[] = "$Id: misc.c 12045 2010-05-24 06:02:11Z wsfulton $";
 
 #include "swig.h"
 #include <errno.h>
 #include <ctype.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#ifndef S_ISDIR
+#define S_ISDIR(mode) (((mode) & S_IFDIR) == S_IFDIR)
+#endif
+#endif
 
 static char *fake_version = 0;
 
@@ -88,8 +101,8 @@ void Swig_banner_target_lang(File *f, const_String_or_char_ptr commentchar) {
 /* -----------------------------------------------------------------------------
  * Swig_strip_c_comments()
  *
- * Return a new string with C comments stripped from the input string. Null is
- * returned if there aren't any.
+ * Return a new string with C comments stripped from the input string. NULL is
+ * returned if there aren't any comments.
  * ----------------------------------------------------------------------------- */
 
 String *Swig_strip_c_comments(const String *s) {
@@ -107,9 +120,10 @@ String *Swig_strip_c_comments(const String *s) {
         comment_begin = c-1;
     } else if (comment_begin && !comment_end && *c == '*') {
       ++c;
-      if (*c == '/')
+      if (*c == '/') {
         comment_end = c;
-      break;
+        break;
+      }
     }
     ++c;
   }
@@ -130,11 +144,79 @@ String *Swig_strip_c_comments(const String *s) {
   return stripped;
 }
 
+/* -----------------------------------------------------------------------------
+ * is_directory()
+ * ----------------------------------------------------------------------------- */
+static int is_directory(String *directory) {
+  int last = Len(directory) - 1;
+  int statres;
+  struct stat st;
+  char *dir = Char(directory);
+  if (dir[last] == SWIG_FILE_DELIMITER[0]) {
+    /* remove trailing slash - can cause S_ISDIR to fail on Windows, at least */
+    dir[last] = 0;
+    statres = stat(dir, &st);
+    dir[last] = SWIG_FILE_DELIMITER[0];
+  } else {
+    statres = stat(dir, &st);
+  }
+  return (statres == 0 && S_ISDIR(st.st_mode));
+}
+
+/* -----------------------------------------------------------------------------
+ * Swig_new_subdirectory()
+ *
+ * Create the subdirectory only if the basedirectory already exists as a directory.
+ * basedirectory can be NULL or empty to indicate current directory.
+ * ----------------------------------------------------------------------------- */
+
+String *Swig_new_subdirectory(String *basedirectory, String *subdirectory) {
+  String *error = 0;
+  struct stat st;
+  int current_directory = basedirectory ? (Len(basedirectory) == 0 ? 1 : 0) : 0;
+
+  if (current_directory || is_directory(basedirectory)) {
+    Iterator it;
+    String *dir = basedirectory ? NewString(basedirectory) : NewString("");
+    List *subdirs = Split(subdirectory, SWIG_FILE_DELIMITER[0], INT_MAX);
+
+    for (it = First(subdirs); it.item; it = Next(it)) {
+      int statdir;
+      String *subdirectory = it.item;
+      Printf(dir, "%s", subdirectory);
+      statdir = stat(Char(dir), &st);
+      if (statdir == 0) {
+	Printf(dir, SWIG_FILE_DELIMITER);
+	if (S_ISDIR(st.st_mode)) {
+	  continue;
+	} else {
+	  error = NewStringf("Cannot create directory %s", dir);
+	  break;
+	}
+      } else {
+#ifdef _WIN32
+	int result = _mkdir(Char(dir));
+#else
+	int result = mkdir(Char(dir), 0777);
+#endif
+	Printf(dir, SWIG_FILE_DELIMITER);
+	if (result != 0 && errno != EEXIST) {
+	  error = NewStringf("Cannot create directory %s", dir);
+	  break;
+	}
+      }
+    }
+  } else {
+    error = NewStringf("Cannot create subdirectory %s under the base directory %s. Either the base does not exist as a directory or it is not readable.", subdirectory, basedirectory);
+  }
+  return error;
+}
 
 /* -----------------------------------------------------------------------------
  * Swig_filename_correct()
  *
- * Corrects filenames on non-unix systems
+ * Corrects filename paths by removing duplicate delimeters and on non-unix
+ * systems use the correct delimeter across the whole name.
  * ----------------------------------------------------------------------------- */
 
 void Swig_filename_correct(String *filename) {
@@ -147,6 +229,9 @@ void Swig_filename_correct(String *filename) {
   /* accept Windows path separator in addition to Unix path separator */
   Replaceall(filename, "\\", SWIG_FILE_DELIMITER);
 #endif
+  /* remove all duplicate file name delimiters */
+  while (Replaceall(filename, SWIG_FILE_DELIMITER SWIG_FILE_DELIMITER, SWIG_FILE_DELIMITER)) {
+  }
 }
 
 /* -----------------------------------------------------------------------------
@@ -158,10 +243,25 @@ void Swig_filename_correct(String *filename) {
 String *Swig_filename_escape(String *filename) {
   String *adjusted_filename = Copy(filename);
 #if defined(_WIN32)		/* Note not on Cygwin else filename is displayed with double '/' */
-    Replaceall(adjusted_filename, "\\\\", "\\");	/* remove double '\' in case any already present */
-    Replaceall(adjusted_filename, "\\", "\\\\");
+  /* remove all double '\' in case any already present */
+  while (Replaceall(adjusted_filename, "\\\\", "\\")) {
+  }
+  Replaceall(adjusted_filename, "\\", "\\\\");
 #endif
     return adjusted_filename;
+}
+
+/* -----------------------------------------------------------------------------
+ * Swig_filename_unescape()
+ *
+ * Remove double backslash escaping in filename - for Windows
+ * ----------------------------------------------------------------------------- */
+
+void Swig_filename_unescape(String *filename) {
+  (void)filename;
+#if defined(_WIN32)
+  Replaceall(filename, "\\\\", "\\");
+#endif
 }
 
 /* -----------------------------------------------------------------------------
@@ -892,7 +992,11 @@ String *Swig_scopename_suffix(const String *s) {
 /* -----------------------------------------------------------------------------
  * Swig_scopename_check()
  *
- * Checks to see if a name is qualified with a scope name
+ * Checks to see if a name is qualified with a scope name, examples:
+ *   foo            -> 0
+ *   ::foo          -> 1
+ *   foo::bar       -> 1
+ *   foo< ::bar >   -> 0
  * ----------------------------------------------------------------------------- */
 
 int Swig_scopename_check(const String *s) {

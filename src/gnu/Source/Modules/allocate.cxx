@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * allocate.cxx
  *
@@ -11,7 +15,7 @@
  * Doc/Manual/SWIGPlus.html for details.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_allocate_cxx[] = "$Id: allocate.cxx 11583 2009-08-15 23:22:20Z wsfulton $";
+char cvsroot_allocate_cxx[] = "$Id: allocate.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swigmod.h"
 #include "cparse.h"
@@ -518,7 +522,7 @@ class Allocate:public Dispatcher {
      */
     String *scatchlist = Getattr(n, "feature:catches");
     if (scatchlist) {
-      catchlist = Swig_cparse_parms(scatchlist);
+      catchlist = Swig_cparse_parms(scatchlist, n);
       if (catchlist) {
 	Setattr(n, "catchlist", catchlist);
 	mark_exception_classes(catchlist);

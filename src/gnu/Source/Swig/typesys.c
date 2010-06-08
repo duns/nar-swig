@@ -1,6 +1,10 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * typesys.c
  *
@@ -10,7 +14,7 @@
  * run-time type checker is also handled here.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_typesys_c[] = "$Id: typesys.c 11097 2009-01-30 10:27:37Z bhy $";
+char cvsroot_typesys_c[] = "$Id: typesys.c 12025 2010-05-14 04:10:19Z olly $";
 
 #include "swig.h"
 #include "cparse.h"
@@ -75,7 +79,7 @@ char cvsroot_typesys_c[] = "$Id: typesys.c 11097 2009-01-30 10:27:37Z bhy $";
  *
  *     class Bar : public Foo {
  *           void blah(Integer x);
- *     }
+ *     };
  *
  * The argument type of Bar::blah will be set to Foo::Integer.   
  *
@@ -840,17 +844,14 @@ SwigType *SwigType_typedef_resolve_all(SwigType *t) {
  *
  * Given a type declaration, this function tries to fully qualify it according to
  * typedef scope rules.
- * Inconsistency to be fixed: ::Foo returns ::Foo, whereas ::Foo * returns Foo *
+ * If the unary scope operator (::) is used as a prefix to the type to denote global
+ * scope, it is left in place.
  * ----------------------------------------------------------------------------- */
 
 SwigType *SwigType_typedef_qualified(SwigType *t) {
   List *elements;
   String *result;
   int i, len;
-
-  if (strncmp(Char(t), "::", 2) == 0) {
-    return Copy(t);
-  }
 
   if (!typedef_qualified_cache)
     typedef_qualified_cache = NewHash();
@@ -999,10 +1000,6 @@ SwigType *SwigType_typedef_qualified(SwigType *t) {
 	Delete(qprefix);
 	Delete(parms);
       }
-      if (strncmp(Char(e), "::", 2) == 0) {
-	Delitem(e, 0);
-	Delitem(e, 0);
-      }
       Append(result, e);
       Delete(ty);
     } else if (SwigType_isfunction(e)) {
@@ -1120,11 +1117,13 @@ int SwigType_typedef_using(const_String_or_char_ptr name) {
   /* Figure out the scope the using directive refers to */
   {
     prefix = Swig_scopename_prefix(name);
-    s = SwigType_find_scope(current_scope, prefix);
-    if (s) {
-      Hash *ttab = Getattr(s, "typetab");
-      if (!Getattr(ttab, base) && defined_name) {
-	Setattr(ttab, base, defined_name);
+    if (prefix) {
+      s = SwigType_find_scope(current_scope, prefix);
+      if (s) {
+	Hash *ttab = Getattr(s, "typetab");
+	if (!Getattr(ttab, base) && defined_name) {
+	  Setattr(ttab, base, defined_name);
+	}
       }
     }
   }
@@ -1166,9 +1165,9 @@ int SwigType_isclass(SwigType *t) {
       isclass = 1;
     }
     /* Hmmm. Not a class.  If a template, it might be uninstantiated */
-    if (!isclass && SwigType_istemplate(qtys)) {
-      String *tp = SwigType_templateprefix(qtys);
-      if (Strcmp(tp, t) != 0) {
+    if (!isclass) {
+      String *tp = SwigType_istemplate_templateprefix(qtys);
+      if (tp && Strcmp(tp, t) != 0) {
 	isclass = SwigType_isclass(tp);
       }
       Delete(tp);
@@ -1774,7 +1773,7 @@ void SwigType_inherit_equiv(File *out) {
       continue;
     }
 
-    /* This type has subclasses.  We now need to walk through these subtypes and generate pointer converion functions */
+    /* This type has subclasses.  We now need to walk through these subtypes and generate pointer conversion functions */
 
     rh = Getattr(r_resolved, rk.key);
     rlist = NewList();

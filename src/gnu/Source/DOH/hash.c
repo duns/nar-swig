@@ -1,15 +1,17 @@
 /* -----------------------------------------------------------------------------
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
+ *
  * hash.c
  *
  *     Implements a simple hash table object.
- *
- * Author(s) : David Beazley (beazley@cs.uchicago.edu)
- *
- * Copyright (C) 1999-2000.  The University of Chicago
- * See the file LICENSE for information on usage and redistribution.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_hash_c[] = "$Id: hash.c 10926 2008-11-11 22:17:40Z wsfulton $";
+char cvsroot_hash_c[] = "$Id: hash.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "dohint.h"
 

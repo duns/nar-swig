@@ -1,13 +1,17 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * module.cxx
  *
  * This file is responsible for the module system.  
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_module_cxx[] = "$Id: module.cxx 10003 2007-10-17 21:42:11Z wsfulton $";
+char cvsroot_module_cxx[] = "$Id: module.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swigmod.h"
 

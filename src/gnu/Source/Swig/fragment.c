@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * fragment.c
  *
@@ -12,7 +16,7 @@
  * wrapper code and to generate cleaner wrapper files. 
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_fragment_c[] = "$Id: fragment.c 9632 2007-01-03 20:58:19Z beazley $";
+char cvsroot_fragment_c[] = "$Id: fragment.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swig.h"
 #include "swigwarn.h"

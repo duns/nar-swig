@@ -81,8 +81,7 @@ am_eswig_OBJECTS = CParse/cscanner.$(OBJEXT) CParse/parser.$(OBJEXT) \
 	Swig/scanner.$(OBJEXT) Swig/stype.$(OBJEXT) \
 	Swig/symbol.$(OBJEXT) Swig/tree.$(OBJEXT) \
 	Swig/typeobj.$(OBJEXT) Swig/typemap.$(OBJEXT) \
-	Swig/typesys.$(OBJEXT) Swig/warn.$(OBJEXT) \
-	Swig/wrapfunc.$(OBJEXT)
+	Swig/typesys.$(OBJEXT) Swig/wrapfunc.$(OBJEXT)
 eswig_OBJECTS = $(am_eswig_OBJECTS)
 eswig_DEPENDENCIES =
 DEFAULT_INCLUDES = 
@@ -428,7 +427,6 @@ eswig_SOURCES = CParse/cscanner.c		\
 		Swig/typeobj.c			\
 		Swig/typemap.c			\
 		Swig/typesys.c			\
-		Swig/warn.c			\
 		Swig/wrapfunc.c			
 
 eswig_LDADD = @SWIGLIBS@
@@ -657,8 +655,6 @@ Swig/typemap.$(OBJEXT): Swig/$(am__dirstamp) \
 	Swig/$(DEPDIR)/$(am__dirstamp)
 Swig/typesys.$(OBJEXT): Swig/$(am__dirstamp) \
 	Swig/$(DEPDIR)/$(am__dirstamp)
-Swig/warn.$(OBJEXT): Swig/$(am__dirstamp) \
-	Swig/$(DEPDIR)/$(am__dirstamp)
 Swig/wrapfunc.$(OBJEXT): Swig/$(am__dirstamp) \
 	Swig/$(DEPDIR)/$(am__dirstamp)
 eswig$(EXEEXT): $(eswig_OBJECTS) $(eswig_DEPENDENCIES) 
@@ -731,7 +727,6 @@ mostlyclean-compile:
 	-rm -f Swig/typemap.$(OBJEXT)
 	-rm -f Swig/typeobj.$(OBJEXT)
 	-rm -f Swig/typesys.$(OBJEXT)
-	-rm -f Swig/warn.$(OBJEXT)
 	-rm -f Swig/wrapfunc.$(OBJEXT)
 
 distclean-compile:
@@ -801,7 +796,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Swig/$(DEPDIR)/typemap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Swig/$(DEPDIR)/typeobj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Swig/$(DEPDIR)/typesys.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Swig/$(DEPDIR)/warn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Swig/$(DEPDIR)/wrapfunc.Po@am__quote@
 
 .c.o:
@@ -966,7 +960,7 @@ distclean: distclean-am
 	-rm -rf CParse/$(DEPDIR) DOH/$(DEPDIR) Modules/$(DEPDIR) Preprocessor/$(DEPDIR) Swig/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+	distclean-local distclean-tags
 
 dvi: dvi-am
 
@@ -1019,16 +1013,17 @@ uninstall-am: uninstall-binPROGRAMS
 
 .PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
 	clean-binPROGRAMS clean-generic clean-local ctags distclean \
-	distclean-compile distclean-generic distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+	distclean-compile distclean-generic distclean-local \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binPROGRAMS
 
 
 # The executable is copied to the root directory for installation and running the test-suite.
@@ -1040,6 +1035,10 @@ all-local: eswig@EXEEXT@
 clean-local:
 	rm -f $(top_builddir)/swig@EXEEXT@
 	rm -f core @EXTRA_CLEAN@
+
+distclean-local:
+	rm -f $(top_builddir)/Source/Include/swigconfig.h
+	rm -f $(top_builddir)/Source/Include/stamp-h1
 
 beautify:
 	rm -rf $(INDENTBAKSDIR)

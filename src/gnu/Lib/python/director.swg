@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * director.swg
  *
  * This file contains support for director classes that proxy
@@ -88,13 +85,13 @@ namespace Swig {
 }
 # endif /* SWIG_DIRECTOR_RTDIR */
 
-# define SWIG_DIRECTOR_CAST(Arg) Swig::get_rtdir(static_cast<void*>(Arg))
-# define SWIG_DIRECTOR_RGTR(Arg1, Arg2) Swig::set_rtdir(static_cast<void*>(Arg1), Arg2)
+# define SWIG_DIRECTOR_CAST(ARG) Swig::get_rtdir(static_cast<void*>(ARG))
+# define SWIG_DIRECTOR_RGTR(ARG1, ARG2) Swig::set_rtdir(static_cast<void*>(ARG1), ARG2)
 
 #else
 
-# define SWIG_DIRECTOR_CAST(Arg) dynamic_cast<Swig::Director*>(Arg)
-# define SWIG_DIRECTOR_RGTR(Arg1, Arg2)
+# define SWIG_DIRECTOR_CAST(ARG) dynamic_cast<Swig::Director *>(ARG)
+# define SWIG_DIRECTOR_RGTR(ARG1, ARG2)
 
 #endif /* SWIG_DIRECTOR_NORTTI */
 
@@ -237,7 +234,7 @@ namespace Swig {
       try {
         throw;
       } catch (DirectorException& e) {
-        std::cerr << "Swig Director exception caught:" << std::endl
+        std::cerr << "SWIG Director exception caught:" << std::endl
                   << e.getMessage() << std::endl;
       } catch (std::exception& e) {
         std::cerr << "std::exception caught: "<< e.what() << std::endl;
@@ -276,12 +273,12 @@ namespace Swig {
   class DirectorTypeMismatchException : public Swig::DirectorException {
   public:
     DirectorTypeMismatchException(PyObject *error, const char* msg="") 
-      : Swig::DirectorException(error, "Swig director type mismatch", msg)
+      : Swig::DirectorException(error, "SWIG director type mismatch", msg)
     {
     }
 
     DirectorTypeMismatchException(const char* msg="") 
-      : Swig::DirectorException(PyExc_TypeError, "Swig director type mismatch", msg)
+      : Swig::DirectorException(PyExc_TypeError, "SWIG director type mismatch", msg)
     {
     }
 
@@ -300,7 +297,7 @@ namespace Swig {
   class DirectorMethodException : public Swig::DirectorException {
   public:
     DirectorMethodException(const char* msg = "") 
-      : DirectorException(PyExc_RuntimeError, "Swig director method error.", msg)
+      : DirectorException(PyExc_RuntimeError, "SWIG director method error.", msg)
     {
     }    
 
@@ -315,7 +312,7 @@ namespace Swig {
   {
   public:
     DirectorPureVirtualException(const char* msg = "") 
-      : DirectorException(PyExc_RuntimeError, "Swig director pure virtual method called", msg)
+      : DirectorException(PyExc_RuntimeError, "SWIG director pure virtual method called", msg)
     { 
     }
 
@@ -407,17 +404,17 @@ namespace Swig {
     }
 
     /* methods to implement pseudo protected director members */
-    virtual bool swig_get_inner(const char* /* name */) const {
+    virtual bool swig_get_inner(const char* /* protected_method_name */) const {
       return true;
     }
     
-    virtual void swig_set_inner(const char* /* name */, bool /* val */) const {
+    virtual void swig_set_inner(const char* /* protected_method_name */, bool /* val */) const {
     }
 
   /* ownership management */
   private:
-    typedef std::map<void*, GCItem_var> ownership_map;
-    mutable ownership_map owner;
+    typedef std::map<void*, GCItem_var> swig_ownership_map;
+    mutable swig_ownership_map swig_owner;
 #ifdef __THREAD__
     static PyThread_type_lock swig_mutex_own;
 #endif
@@ -428,7 +425,7 @@ namespace Swig {
     {
       if (vptr) {
         SWIG_GUARD(swig_mutex_own);
-        owner[vptr] = new GCArray_T<Type>(vptr);
+        swig_owner[vptr] = new GCArray_T<Type>(vptr);
       }
     }
     
@@ -437,7 +434,7 @@ namespace Swig {
     {
       if (vptr) {
         SWIG_GUARD(swig_mutex_own);
-        owner[vptr] = new GCItem_T<Type>(vptr);
+        swig_owner[vptr] = new GCItem_T<Type>(vptr);
       }
     }
 
@@ -445,7 +442,7 @@ namespace Swig {
     {
       if (vptr && own) {
         SWIG_GUARD(swig_mutex_own);
-        owner[vptr] = new GCItem_Object(own);
+        swig_owner[vptr] = new GCItem_Object(own);
       }
     }
     
@@ -454,10 +451,10 @@ namespace Swig {
       int own = 0;
       if (vptr) {
         SWIG_GUARD(swig_mutex_own);
-        ownership_map::iterator iter = owner.find(vptr);
-        if (iter != owner.end()) {
+        swig_ownership_map::iterator iter = swig_owner.find(vptr);
+        if (iter != swig_owner.end()) {
           own = iter->second->get_own();
-          owner.erase(iter);
+          swig_owner.erase(iter);
         }
       }
       return own;

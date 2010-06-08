@@ -1,13 +1,17 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * clisp.cxx
  *
  * clisp language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_clisp_cxx[] = "$Id: clisp.cxx 11380 2009-07-08 12:17:45Z wsfulton $";
+char cvsroot_clisp_cxx[] = "$Id: clisp.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swigmod.h"
 
@@ -452,7 +456,7 @@ String *CLISP::get_ffi_type(Node *n, SwigType *ty) {
     SwigType *cp = Copy(ty);
     SwigType *fn = SwigType_pop_function(cp);
     String *args = NewString("");
-    ParmList *pl = SwigType_function_parms(fn);
+    ParmList *pl = SwigType_function_parms(fn, n);
     if (ParmList_len(pl) != 0) {
       Printf(args, "(:arguments ");
     }

@@ -28,12 +28,17 @@
 # The 'clean' target cleans up.
 #
 # Note that the RUNTOOL, COMPILETOOL and SWIGTOOL variables can be used
-# for # invoking tools for the runtime tests and target language 
-# compiler (eg javac) respectively. For example, valgrind can be used 
-# for memory checking of the runtime tests using:
-#   make RUNTOOL="valgrind --leak-check-full"
+# for invoking tools for the runtime tests and target language 
+# compiler (eg javac), and on SWIG respectively. For example, valgrind
+# can be used for memory checking of the runtime tests using:
+#   make RUNTOOL="valgrind --leak-check=full"
 # and valgrind can be used when invoking SWIG using:
-#   make SWIGTOOL="valgrind --tool=memcheck"
+#   make SWIGTOOL="valgrind --tool=memcheck --trace-children=yes"
+#    Note: trace-children needed because of preinst-swig shell wrapper
+#    to the swig executable.
+#
+# An individual test run can be debugged easily:
+#   make director_string.cpptest RUNTOOL="gdb --args"
 #
 # The variables below can be overridden after including this makefile
 #######################################################################
@@ -78,8 +83,6 @@ CPP_TEST_BROKEN += \
 	exception_partial_info \
 	extend_variable \
 	li_std_vector_ptr \
-	namespace_union \
-	nested_structs \
 	overload_complicated \
 	template_default_pointer \
 	template_expr
@@ -131,6 +134,7 @@ CPP_TEST_CASES += \
 	constructor_exception \
 	constructor_explicit \
 	constructor_ignore \
+	constructor_rename \
 	constructor_value \
 	contract \
 	conversion \
@@ -189,14 +193,17 @@ CPP_TEST_CASES += \
 	extend_placement \
 	extend_template \
 	extend_template_ns \
+	extern_c \
 	extern_namespace \
 	extern_throws \
+	expressions \
 	features \
 	fragments \
 	friends \
 	fvirtual \
 	global_namespace \
 	global_ns_arg \
+	global_scope_types \
 	global_vars \
 	grouping \
 	ignore_parameter \
@@ -238,9 +245,14 @@ CPP_TEST_CASES += \
 	namespace_template \
 	namespace_typedef_class \
 	namespace_typemap \
+	namespace_union \
 	namespace_virtual_method \
+	nspace \
+	nspace_extend \
 	naturalvar \
+	nested_class \
 	nested_comment \
+	nested_workaround \
 	newobject1 \
 	null_pointer \
 	operator_overload \
@@ -255,6 +267,7 @@ CPP_TEST_CASES += \
 	overload_template \
 	overload_template_fast \
 	pointer_reference \
+	preproc_constants \
 	primitive_ref \
 	private_assign \
 	protected_rename \
@@ -297,7 +310,9 @@ CPP_TEST_CASES += \
 	static_array_member \
 	static_const_member \
 	static_const_member_2 \
+	struct_initialization_cpp \
 	struct_value \
+	symbol_clash \
 	template \
 	template_arg_replace \
 	template_arg_scope \
@@ -327,6 +342,8 @@ CPP_TEST_CASES += \
 	template_inherit_abstract \
 	template_int_const \
 	template_methods \
+	template_nested \
+	template_nested_typemaps \
 	template_ns \
 	template_ns2 \
 	template_ns3 \
@@ -336,6 +353,8 @@ CPP_TEST_CASES += \
 	template_ns_inherit \
 	template_ns_scope \
 	template_partial_arg \
+	template_partial_specialization \
+	template_partial_specialization_typedef \
 	template_qualifier \
 	template_qualifier \
 	template_ref_type \
@@ -361,6 +380,7 @@ CPP_TEST_CASES += \
 	template_virtual \
 	template_whitespace \
 	threads \
+	threads_exception \
 	throw_exception \
 	typedef_array_member \
 	typedef_class \
@@ -371,10 +391,14 @@ CPP_TEST_CASES += \
 	typedef_scope \
 	typedef_sizet \
 	typedef_struct \
+	typemap_delete \
+	typemap_global_scope \
 	typemap_namespace \
 	typemap_ns_using \
 	typemap_numinputs \
+	typemap_template \
 	typemap_out_optimal \
+	typemap_qualifier_strip \
 	typemap_variables \
 	typemap_various \
 	typename \
@@ -409,6 +433,7 @@ CPP_STD_TEST_CASES += \
 	li_std_combinations \
 	li_std_deque \
 	li_std_except \
+	li_std_map \
         li_std_pair \
 	li_std_string \
 	li_std_vector \
@@ -430,6 +455,7 @@ C_TEST_CASES += \
 	arrays \
 	char_constant \
 	const_const \
+	constant_expr \
 	empty \
 	enums \
 	extern_declaration \
@@ -447,17 +473,21 @@ C_TEST_CASES += \
 	li_cpointer \
 	li_math \
 	long_long \
+	memberin_extend_c \
 	name \
 	nested \
+	nested_structs \
 	newobject2 \
 	overload_extend \
 	overload_extendc \
 	preproc \
+	preproc_constants_c \
 	ret_by_value \
 	simple_array \
 	sizeof_pointer \
 	sneaky1 \
 	struct_rename \
+	struct_initialization \
 	typedef_struct \
 	typemap_subst \
 	union_parameter \

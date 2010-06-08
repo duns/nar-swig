@@ -4,8 +4,12 @@
 
 
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * swigwarn.h
  *
@@ -20,8 +24,6 @@
  * not always the case in SWIG interface files.  Do not change the
  * numbers in this file.
  * ----------------------------------------------------------------------------- */
-
-/* $Id: swigwarn.h 11459 2009-07-28 11:47:36Z vmiklos $ */
 
 
 %define SWIGWARN_NONE 0 %enddef
@@ -75,7 +77,7 @@
 %define SWIGWARN_PARSE_PRIVATE_INHERIT 309 %enddef
 %define SWIGWARN_PARSE_TEMPLATE_REPEAT 310 %enddef
 %define SWIGWARN_PARSE_TEMPLATE_PARTIAL 311 %enddef
-%define SWIGWARN_PARSE_NESTED_CLASS 312 %enddef
+%define SWIGWARN_PARSE_UNNAMED_NESTED_CLASS 312 %enddef
 %define SWIGWARN_PARSE_UNDEFINED_EXTERN 313 %enddef
 %define SWIGWARN_PARSE_KEYWORD 314 %enddef
 %define SWIGWARN_PARSE_USING_UNDEF 315 %enddef
@@ -87,6 +89,8 @@
 %define SWIGWARN_PARSE_BUILTIN_NAME 321 %enddef
 %define SWIGWARN_PARSE_REDUNDANT 322 %enddef
 %define SWIGWARN_PARSE_REC_INHERITANCE 323 %enddef
+%define SWIGWARN_PARSE_NESTED_TEMPLATE 324 %enddef
+%define SWIGWARN_PARSE_NAMED_NESTED_CLASS 325 %enddef
 
 %define SWIGWARN_IGNORE_OPERATOR_NEW 350 %enddef /* new */
 %define SWIGWARN_IGNORE_OPERATOR_DELETE 351 %enddef /* delete */

@@ -1,13 +1,17 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * cffi.cxx
  *
  * cffi language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_cffi_cxx[] = "$Id: cffi.cxx 11380 2009-07-08 12:17:45Z wsfulton $";
+char cvsroot_cffi_cxx[] = "$Id: cffi.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swigmod.h"
 #include "cparse.h"
@@ -618,12 +622,12 @@ int CFFI::enumDeclaration(Node *n) {
     slot_name_keywords = true;
 
     //Registering the enum name to the cin and cout typemaps
-    Parm *pattern = NewParm(name, NULL);
+    Parm *pattern = NewParm(name, NULL, n);
     Swig_typemap_register("cin", pattern, lisp_name, NULL, NULL);
     Swig_typemap_register("cout", pattern, lisp_name, NULL, NULL);
     Delete(pattern);
     //Registering with the kind, i.e., enum
-    pattern = NewParm(NewStringf("enum %s", name), NULL);
+    pattern = NewParm(NewStringf("enum %s", name), NULL, n);
     Swig_typemap_register("cin", pattern, lisp_name, NULL, NULL);
     Swig_typemap_register("cout", pattern, lisp_name, NULL, NULL);
     Delete(pattern);
@@ -688,7 +692,7 @@ void CFFI::emit_class(Node *n) {
   Printf(f_clos, "\n(cl:defclass %s%s", lisp_name, supers);
   Printf(f_clos, "\n  ((ff-pointer :reader ff-pointer)))\n\n");
 
-  Parm *pattern = NewParm(Getattr(n, "name"), NULL);
+  Parm *pattern = NewParm(Getattr(n, "name"), NULL, n);
 
   Swig_typemap_register("lispclass", pattern, lisp_name, NULL, NULL);
   SwigType_add_pointer(Getattr(pattern, "type"));
@@ -758,7 +762,7 @@ void CFFI::emit_class(Node *n) {
   Delete(supers);
   //  Delete(ns_list);
 
-  //  Parm *pattern = NewParm(name,NULL);
+  //  Parm *pattern = NewParm(name, NULL, n);
   // Swig_typemap_register("cin",pattern,lisp_name,NULL,NULL);  
   //Swig_typemap_register("cout",pattern,lisp_name,NULL,NULL);
   //Delete(pattern);
@@ -787,12 +791,12 @@ void CFFI::emit_struct_union(Node *n, bool un = false) {
 
   //Register the struct/union name to the cin and cout typemaps
 
-  Parm *pattern = NewParm(name, NULL);
+  Parm *pattern = NewParm(name, NULL, n);
   Swig_typemap_register("cin", pattern, lisp_name, NULL, NULL);
   Swig_typemap_register("cout", pattern, lisp_name, NULL, NULL);
   Delete(pattern);
   //Registering with the kind, i.e., struct or union
-  pattern = NewParm(NewStringf("%s %s", kind, name), NULL);
+  pattern = NewParm(NewStringf("%s %s", kind, name), NULL, n);
   Swig_typemap_register("cin", pattern, lisp_name, NULL, NULL);
   Swig_typemap_register("cout", pattern, lisp_name, NULL, NULL);
   Delete(pattern);

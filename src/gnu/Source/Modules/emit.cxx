@@ -1,13 +1,17 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * emit.cxx
  *
  * Useful functions for emitting various pieces of code.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_emit_cxx[] = "$Id: emit.cxx 11471 2009-07-29 20:52:29Z wsfulton $";
+char cvsroot_emit_cxx[] = "$Id: emit.cxx 11980 2010-04-08 06:46:18Z wsfulton $";
 
 #include "swigmod.h"
 
@@ -458,7 +462,15 @@ String *emit_action(Node *n) {
     Printf(eaction, "try {\n");
   }
 
+  String *preaction = Getattr(n, "wrap:preaction");
+  if (preaction)
+    Printv(eaction, preaction, NIL);
+
   Printv(eaction, action, NIL);
+
+  String *postaction = Getattr(n, "wrap:postaction");
+  if (postaction)
+    Printv(eaction, postaction, NIL);
 
   if (catchlist) {
     int unknown_catch = 0;
@@ -466,24 +478,24 @@ String *emit_action(Node *n) {
     for (Parm *ep = catchlist; ep; ep = nextSibling(ep)) {
       String *em = Swig_typemap_lookup("throws", ep, "_e", 0);
       if (em) {
-	SwigType *et = Getattr(ep, "type");
-	SwigType *etr = SwigType_typedef_resolve_all(et);
-	if (SwigType_isreference(etr) || SwigType_ispointer(etr) || SwigType_isarray(etr)) {
-	  Printf(eaction, "catch(%s) {", SwigType_str(et, "_e"));
-	} else if (SwigType_isvarargs(etr)) {
-	  Printf(eaction, "catch(...) {");
-	} else {
-	  Printf(eaction, "catch(%s) {", SwigType_str(et, "&_e"));
-	}
-	Printv(eaction, em, "\n", NIL);
-	Printf(eaction, "}\n");
+        SwigType *et = Getattr(ep, "type");
+        SwigType *etr = SwigType_typedef_resolve_all(et);
+        if (SwigType_isreference(etr) || SwigType_ispointer(etr) || SwigType_isarray(etr)) {
+          Printf(eaction, "catch(%s) {", SwigType_str(et, "_e"));
+        } else if (SwigType_isvarargs(etr)) {
+          Printf(eaction, "catch(...) {");
+        } else {
+          Printf(eaction, "catch(%s) {", SwigType_str(et, "&_e"));
+        }
+        Printv(eaction, em, "\n", NIL);
+        Printf(eaction, "}\n");
       } else {
 	Swig_warning(WARN_TYPEMAP_THROW, Getfile(n), Getline(n), "No 'throws' typemap defined for exception type '%s'\n", SwigType_str(Getattr(ep, "type"), 0));
-	unknown_catch = 1;
+        unknown_catch = 1;
       }
     }
     if (unknown_catch) {
-      Printf(eaction, "catch(...) { throw; }\n");
+    Printf(eaction, "catch(...) { throw; }\n");
     }
   }
 

@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * attribute.swg
  *
  * Attribute implementation
@@ -224,7 +221,7 @@
   #if #AccessorMethod != ""
     %attribute_custom(Class, AttributeType, AttributeName, AccessorMethod, AccessorMethod, &self_->AccessorMethod(), self_->AccessorMethod() = *val_)
   #else
-    %attribute_custom(Class, AttributeType, AccessorMethod, AccessorMethod, AccessorMethod, &self_->AccessorMethod(), self_->AccessorMethod() = *val_)
+    %attribute_custom(Class, AttributeType, AccessorName, AccessorName, AccessorName, &self_->AccessorName(), self_->AccessorName() = *val_)
   #endif
 %enddef
 

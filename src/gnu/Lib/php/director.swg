@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * director.swg
  *
  * This file contains support for director classes that proxy
@@ -103,19 +100,19 @@ namespace Swig {
   class Director {
     protected:
       zval *swig_self;
-      typedef std::map<void*, GCItem_var> ownership_map;
-      mutable ownership_map owner;
+      typedef std::map<void*, GCItem_var> swig_ownership_map;
+      mutable swig_ownership_map swig_owner;
     public:
       Director(zval* self) : swig_self(self) {
       }
 
       ~Director() {
-        for (ownership_map::iterator i = owner.begin(); i != owner.end(); i++) {
-          owner.erase(i);
+        for (swig_ownership_map::iterator i = swig_owner.begin(); i != swig_owner.end(); i++) {
+          swig_owner.erase(i);
         }
       }
 
-      bool is_overriden_method(char *cname, char *lc_fname) {
+      bool swig_is_overridden_method(char *cname, char *lc_fname) {
         zval classname;
         zend_class_entry **ce;
         zend_function *mptr;
@@ -136,7 +133,7 @@ namespace Swig {
       void swig_acquire_ownership(Type *vptr) const
       {
         if (vptr) {
-          owner[vptr] = new GCItem_T<Type>(vptr);
+          swig_owner[vptr] = new GCItem_T<Type>(vptr);
         }
       }
   };
@@ -168,7 +165,7 @@ namespace Swig {
   {
   public:
     DirectorPureVirtualException(const char* msg) 
-      : DirectorException(E_ERROR, "Swig director pure virtual method called", msg)
+      : DirectorException(E_ERROR, "SWIG director pure virtual method called", msg)
     { 
     }
 
@@ -182,7 +179,7 @@ namespace Swig {
   {
   public:
     DirectorMethodException(const char* msg = "") 
-      : DirectorException(E_ERROR, "Swig director method error", msg)
+      : DirectorException(E_ERROR, "SWIG director method error", msg)
     { 
     }
 

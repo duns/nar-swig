@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * luarun.swg
  *
  * This file contains the runtime support for Lua modules
@@ -79,7 +76,7 @@ typedef struct {
 /* this is the struct for wrapping arbitary packed binary data
 (currently it is only used for member function pointers)
 the data ordering is similar to swig_lua_userdata, but it is currently not possible
-to tell the two structures apart within Swig, other than by looking at the type
+to tell the two structures apart within SWIG, other than by looking at the type
 */
 typedef struct {
   swig_type_info   *type;
@@ -664,7 +661,7 @@ SWIGRUNTIME const char *SWIG_Lua_typename(lua_State *L, int tp)
   swig_lua_userdata* usr;
   if (lua_isuserdata(L,tp))
   {
-    usr=(swig_lua_userdata*)lua_touserdata(L,1);  /* get data */
+    usr=(swig_lua_userdata*)lua_touserdata(L,tp);  /* get data */
     if (usr && usr->type && usr->type->str)
       return usr->type->str;
     return "userdata (unknown type)";

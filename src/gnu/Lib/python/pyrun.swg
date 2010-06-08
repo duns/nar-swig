@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * pyrun.swg
  *
  * This file contains the runtime support for Python modules
@@ -1089,7 +1086,7 @@ SWIG_Python_ConvertPtrAndOwn(PyObject *obj, void **ptr, swig_type_info *ty, int 
               int newmemory = 0;
               *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
               if (newmemory == SWIG_CAST_NEW_MEMORY) {
-                assert(own);
+                assert(own); /* badly formed typemap which will lead to a memory leak - it must set and use own to delete *ptr */
                 if (own)
                   *own = *own | SWIG_CAST_NEW_MEMORY;
               }

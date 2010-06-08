@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * include.c
  *
@@ -9,7 +13,7 @@
  * are provided.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_include_c[] = "$Id: include.c 11080 2009-01-24 13:15:51Z bhy $";
+char cvsroot_include_c[] = "$Id: include.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swig.h"
 
@@ -184,9 +188,8 @@ static FILE *Swig_open_file(const_String_or_char_ptr name, int sysfile, int use_
   }
   if (f) {
     Delete(lastpath);
-    lastpath = Swig_filename_escape(filename);
+    lastpath = filename;
   }
-  Delete(filename);
   return f;
 }
 
@@ -244,7 +247,7 @@ static String *Swig_include_any(const_String_or_char_ptr name, int sysfile) {
   str = Swig_read_file(f);
   fclose(f);
   Seek(str, 0, SEEK_SET);
-  file = Copy(lastpath);
+  file = Copy(Swig_last_file());
   Setfile(str, file);
   Delete(file);
   Setline(str, 1);

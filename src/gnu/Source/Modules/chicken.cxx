@@ -1,13 +1,17 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * chicken.cxx
  *
  * CHICKEN language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_chicken_cxx[] = "$Id: chicken.cxx 11133 2009-02-20 07:52:24Z wsfulton $";
+char cvsroot_chicken_cxx[] = "$Id: chicken.cxx 12034 2010-05-21 07:10:12Z olly $";
 
 #include "swigmod.h"
 
@@ -673,7 +677,7 @@ int CHICKEN::variableWrapper(Node *n) {
   String *wname = NewString("");
   String *mangle = NewString("");
   String *tm;
-  String *tm2 = NewString("");;
+  String *tm2 = NewString("");
   String *argnum = NewString("0");
   String *arg = NewString("argv[0]");
   Wrapper *f;
@@ -1148,9 +1152,9 @@ int CHICKEN::membervariableHandler(Node *n) {
 
   //String *getfunc = NewStringf("%s-%s-get", short_class_name, proc);
   //String *setfunc = NewStringf("%s-%s-set", short_class_name, proc);
-  String *getfunc = Swig_name_get(Swig_name_member(c_class_name, iname));
+  String *getfunc = Swig_name_get(NSPACE_TODO, Swig_name_member(NSPACE_TODO, c_class_name, iname));
   Replaceall(getfunc, "_", "-");
-  String *setfunc = Swig_name_set(Swig_name_member(c_class_name, iname));
+  String *setfunc = Swig_name_set(NSPACE_TODO, Swig_name_member(NSPACE_TODO, c_class_name, iname));
   Replaceall(setfunc, "_", "-");
 
   Printv(clos_class_defines, "        (list '", proc, " ':swig-virtual ':swig-get ", chickenPrimitiveName(getfunc), NIL);
@@ -1197,7 +1201,7 @@ int CHICKEN::constructorHandler(Node *n) {
   has_constructor_args = 1;
 
   String *iname = Getattr(n, "sym:name");
-  constructor_name = Swig_name_construct(iname);
+  constructor_name = Swig_name_construct(NSPACE_TODO, iname);
   Replaceall(constructor_name, "_", "-");
   return SWIG_OK;
 }

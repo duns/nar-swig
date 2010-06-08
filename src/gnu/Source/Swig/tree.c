@@ -1,6 +1,10 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * tree.c
  *
@@ -8,7 +12,7 @@
  * parse trees.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_tree_c[] = "$Id: tree.c 11080 2009-01-24 13:15:51Z bhy $";
+char cvsroot_tree_c[] = "$Id: tree.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swig.h"
 #include <stdarg.h>
@@ -30,7 +34,7 @@ void Swig_print_tags(DOH *obj, DOH *root) {
     croot = root;
 
   while (obj) {
-    Printf(stdout, "%s . %s (%s:%d)\n", croot, nodeType(obj), Getfile(obj), Getline(obj));
+    Swig_diagnostic(Getfile(obj), Getline(obj), "%s . %s\n", croot, nodeType(obj));
     cobj = firstChild(obj);
     if (cobj) {
       newroot = NewStringf("%s . %s", croot, nodeType(obj));
@@ -268,7 +272,7 @@ void Swig_require(const char *ns, Node *n, ...) {
     }
     obj = Getattr(n, name);
     if (!opt && !obj) {
-      Printf(stderr, "%s:%d. Fatal error (Swig_require).  Missing attribute '%s' in node '%s'.\n", Getfile(n), Getline(n), name, nodeType(n));
+      Swig_error(Getfile(n), Getline(n), "Fatal error (Swig_require).  Missing attribute '%s' in node '%s'.\n", name, nodeType(n));
       assert(obj);
     }
     if (!obj)

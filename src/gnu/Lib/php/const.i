@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * const.i
  *
  * Typemaps for constants
@@ -51,3 +48,6 @@
   c.module_number = module_number;
   zend_register_constant( &c TSRMLS_CC );
 }
+
+/* Handled as a global variable. */
+%typemap(consttab) SWIGTYPE (CLASS::*) "";

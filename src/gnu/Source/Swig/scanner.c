@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * scanner.c
  *
@@ -10,13 +14,14 @@
  * to easily construct yacc-compatible scanners.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_scanner_c[] = "$Id: scanner.c 11470 2009-07-29 20:50:39Z wsfulton $";
+char cvsroot_scanner_c[] = "$Id: scanner.c 12034 2010-05-21 07:10:12Z olly $";
 
 #include "swig.h"
 #include <ctype.h>
 
 extern String *cparse_file;
-extern int     cparse_start_line;
+extern int cparse_cplusplus;
+extern int cparse_start_line;
 
 struct Scanner {
   String *text;			/* Current token value */
@@ -730,13 +735,23 @@ static int look(Scanner * s) {
       break;
     case 7:			/* Identifier */
       if ((c = nextchar(s)) == 0)
-	return SWIG_TOKEN_ID;
-      if (isalnum(c) || (c == '_') || (c == '$')) {
+	state = 71;
+      else if (isalnum(c) || (c == '_') || (c == '$')) {
 	state = 7;
       } else {
 	retract(s, 1);
-	return SWIG_TOKEN_ID;
+	state = 71;
       }
+      break;
+
+    case 71:			/* Identifier or true/false */
+      if (cparse_cplusplus) {
+	if (Strcmp(s->text, "true") == 0)
+	  return SWIG_TOKEN_BOOL;
+	else if (Strcmp(s->text, "false") == 0)
+	  return SWIG_TOKEN_BOOL;
+	}
+      return SWIG_TOKEN_ID;
       break;
 
     case 75:			/* Special identifier $ */
@@ -747,7 +762,7 @@ static int look(Scanner * s) {
       } else {
 	retract(s,1);
 	if (Len(s->text) == 1) return SWIG_TOKEN_DOLLAR;
-	return SWIG_TOKEN_ID;
+	state = 71;
       }
       break;
 
@@ -1167,6 +1182,10 @@ int Scanner_skip_balanced(Scanner * s, int startchar, int endchar) {
 	state = 11;
       else if (c == '*')
 	state = 12;
+      else if (c == startchar) {
+	state = 0;
+	num_levels++;
+      }
       else
 	state = 0;
       break;

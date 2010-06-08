@@ -1,13 +1,17 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * guile.cxx
  *
  * Guile language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_guile_cxx[] = "$Id: guile.cxx 11133 2009-02-20 07:52:24Z wsfulton $";
+char cvsroot_guile_cxx[] = "$Id: guile.cxx 12034 2010-05-21 07:10:12Z olly $";
 
 #include "swigmod.h"
 
@@ -653,7 +657,7 @@ public:
     Parm *p;
     String *proc_name = 0;
     char source[256];
-    Wrapper *f = NewWrapper();;
+    Wrapper *f = NewWrapper();
     String *cleanup = NewString("");
     String *outarg = NewString("");
     String *signature = NewString("");
@@ -1407,16 +1411,18 @@ public:
     }
     {
       /* Hack alert: will cleanup later -- Dave */
-      Node *n = NewHash();
-      Setattr(n, "name", var_name);
-      Setattr(n, "sym:name", iname);
-      Setattr(n, "type", nctype);
-      SetFlag(n, "feature:immutable");
+      Node *nn = NewHash();
+      Setfile(nn, Getfile(n));
+      Setline(nn, Getline(n));
+      Setattr(nn, "name", var_name);
+      Setattr(nn, "sym:name", iname);
+      Setattr(nn, "type", nctype);
+      SetFlag(nn, "feature:immutable");
       if (constasvar) {
-	SetFlag(n, "feature:constasvar");
+	SetFlag(nn, "feature:constasvar");
       }
-      variableWrapper(n);
-      Delete(n);
+      variableWrapper(nn);
+      Delete(nn);
     }
     Delete(var_name);
     Delete(nctype);

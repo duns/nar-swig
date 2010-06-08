@@ -1,6 +1,10 @@
 /* ----------------------------------------------------------------------------- 
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * wrapfunc.c
  *
@@ -9,7 +13,7 @@
  * to be created in a piecemeal manner.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_wrapfunc_c[] = "$Id: wrapfunc.c 11080 2009-01-24 13:15:51Z bhy $";
+char cvsroot_wrapfunc_c[] = "$Id: wrapfunc.c 11876 2010-02-27 23:53:33Z wsfulton $";
 
 #include "swig.h"
 #include <ctype.h>

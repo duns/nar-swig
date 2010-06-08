@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * typemaps.swg
  *
  * SWIG Library file containing the main typemap code to support Lua modules.
@@ -202,10 +199,10 @@ There probably is some compiler that its not true for, so the code is left here 
 %{
 #ifdef __cplusplus	/* generic alloc/dealloc fns*/
 #define SWIG_ALLOC_ARRAY(TYPE,LEN) 	new TYPE[LEN]
-#define SWIG_FREE_ARRAY(PTR)		delete[] PTR;
+#define SWIG_FREE_ARRAY(PTR)		delete[] PTR
 #else
 #define SWIG_ALLOC_ARRAY(TYPE,LEN) 	(TYPE *)malloc(LEN*sizeof(TYPE))
-#define SWIG_FREE_ARRAY(PTR)		free(PTR);
+#define SWIG_FREE_ARRAY(PTR)		free(PTR)
 #endif
 /* counting the size of arrays:*/
 SWIGINTERN int SWIG_itable_size(lua_State* L, int index)

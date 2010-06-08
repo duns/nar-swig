@@ -1,6 +1,10 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
+ * This file is part of SWIG, which is licensed as a whole under version 3 
+ * (or any later version) of the GNU General Public License. Some additional
+ * terms also apply to certain portions of SWIG. The full details of the SWIG
+ * license and copyrights can be found in the LICENSE and COPYRIGHT files
+ * included with the SWIG source code as distributed by the SWIG developers
+ * and at http://www.swig.org/legal.html.
  *
  * cpp.c
  *
@@ -13,7 +17,7 @@
  * - Lines beginning with %# are stripped down to #... and passed through.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_cpp_c[] = "$Id: cpp.c 11098 2009-01-30 10:32:59Z bhy $";
+char cvsroot_cpp_c[] = "$Id: cpp.c 12034 2010-05-21 07:10:12Z olly $";
 
 #include "swig.h"
 #include "preprocessor.h"
@@ -187,7 +191,7 @@ void Preprocessor_init(void) {
   Preprocessor_expr_init();	/* Initialize the expression evaluator */
   included_files = NewHash();
 
-  id_scan = NewScanner();;
+  id_scan = NewScanner();
 
 }
 
@@ -625,7 +629,7 @@ unterm:
 /* -----------------------------------------------------------------------------
  * DOH *get_filename(DOH *str)
  *
- * Read a filename from str.   A filename can be enclose in quotes, angle brackets,
+ * Read a filename from str.   A filename can be enclosed in quotes, angle brackets,
  * or bare.
  * ----------------------------------------------------------------------------- */
 
@@ -652,6 +656,7 @@ static String *get_filename(String *str, int *sysfile) {
     if (isspace(c))
       Ungetc(c, str);
   }
+  Swig_filename_unescape(fn);
   Swig_filename_correct(fn);
   Seek(fn, 0, SEEK_SET);
   return fn;
@@ -1593,9 +1598,9 @@ String *Preprocessor_parse(String *s) {
 	  s1 = cpp_include(fn, sysfile);
 	  if (s1) {
 	    if (include_all)
-	      Printf(ns, "%%includefile \"%s\" [\n", Swig_last_file());
+	      Printf(ns, "%%includefile \"%s\" [\n", Swig_filename_escape(Swig_last_file()));
 	    else if (import_all) {
-	      Printf(ns, "%%importfile \"%s\" [\n", Swig_last_file());
+	      Printf(ns, "%%importfile \"%s\" [\n", Swig_filename_escape(Swig_last_file()));
 	      push_imported();
 	    }
 
@@ -1648,7 +1653,7 @@ String *Preprocessor_parse(String *s) {
       state = 0;
       break;
 
-      /* Swig directives  */
+      /* SWIG directives  */
     case 100:
       /* %{,%} block  */
       if (c == '{') {
@@ -1713,7 +1718,7 @@ String *Preprocessor_parse(String *s) {
     case 110:
       if (!isidchar(c)) {
 	Ungetc(c, s);
-	/* Look for common Swig directives  */
+	/* Look for common SWIG directives  */
 	if (Equal(decl, kpp_dinclude) || Equal(decl, kpp_dimport) || Equal(decl, kpp_dextern)) {
 	  /* Got some kind of file inclusion directive  */
 	  if (allow) {
@@ -1732,7 +1737,7 @@ String *Preprocessor_parse(String *s) {
 	      char *dirname;
 	      add_chunk(ns, chunk, allow);
 	      copy_location(s, chunk);
-	      Printf(ns, "%sfile%s \"%s\" [\n", decl, opt, Swig_last_file());
+	      Printf(ns, "%sfile%s \"%s\" [\n", decl, opt, Swig_filename_escape(Swig_last_file()));
 	      if (Equal(decl, kpp_dimport)) {
 		push_imported();
 	      }

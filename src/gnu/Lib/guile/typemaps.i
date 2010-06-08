@@ -1,7 +1,4 @@
 /* -----------------------------------------------------------------------------
- * See the LICENSE file for information on copyright, usage and redistribution
- * of SWIG, and the README file for authors - http://www.swig.org/release.html.
- *
  * typemaps.i
  *
  * Guile-specific typemaps
@@ -450,5 +447,11 @@ typedef unsigned long SCM;
   int res = SWIG_ConvertPtr($input, &ptr, 0, 0);
   $1 = SWIG_CheckState(res);
 }
+
+/* Array reference typemaps */
+%apply SWIGTYPE & { SWIGTYPE ((&)[ANY]) }
+
+/* const pointers */
+%apply SWIGTYPE * { SWIGTYPE *const }
 
 /* typemaps.i ends here */
