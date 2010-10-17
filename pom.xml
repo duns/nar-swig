@@ -40,7 +40,7 @@ under the License.
   <url>http://duns.github.com/maven-swig-plugin</url>
 
   <prerequisites>
-    <maven>2.0.6</maven>
+    <maven>2.0.9</maven>
   </prerequisites>
 
   <scm>
