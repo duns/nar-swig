@@ -16,7 +16,7 @@
  * to SWIG, you would modify this file.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_swigmain_cxx[] = "$Id: swigmain.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_swigmain_cxx[] = "$Id: swigmain.cxx 12108 2010-06-10 01:13:31Z ianlancetaylor $";
 
 #include "swigmod.h"
 #include <ctype.h>
@@ -51,6 +51,7 @@ extern "C" {
   Language *swig_cffi(void);
   Language *swig_uffi(void);
   Language *swig_r(void);
+  Language *swig_go(void);
 }
 
 struct swig_module {
@@ -69,6 +70,7 @@ static swig_module modules[] = {
   {"-clisp", swig_clisp, "CLISP"},
   {"-cffi", swig_cffi, "CFFI"},
   {"-csharp", swig_csharp, "C#"},
+  {"-go", swig_go, "Go"},
   {"-guile", swig_guile, "Guile"},
   {"-java", swig_java, "Java"},
   {"-lua", swig_lua, "Lua"},

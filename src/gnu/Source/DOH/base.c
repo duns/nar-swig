@@ -12,7 +12,7 @@
  *     DOH objects.  A number of small utility functions are also included.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_base_c[] = "$Id: base.c 11897 2010-03-04 21:45:26Z wsfulton $";
+char cvsroot_base_c[] = "$Id: base.c 12167 2010-07-22 16:59:29Z vadz $";
 
 #include "dohint.h"
 
@@ -645,7 +645,7 @@ int DohRead(DOH *obj, void *buffer, int length) {
  * DohWrite()
  * ----------------------------------------------------------------------------- */
 
-int DohWrite(DOH *obj, void *buffer, int length) {
+int DohWrite(DOH *obj, const void *buffer, int length) {
   DohBase *b = (DohBase *) obj;
   DohObjInfo *objinfo;
   if (DohCheck(obj)) {

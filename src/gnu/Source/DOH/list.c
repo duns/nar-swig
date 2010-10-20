@@ -11,7 +11,7 @@
  *     Implements a simple list object.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_list_c[] = "$Id: list.c 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_list_c[] = "$Id: list.c 12221 2010-09-15 20:17:11Z wsfulton $";
 
 #include "dohint.h"
 
@@ -252,7 +252,7 @@ static DOH *List_str(DOH *lo) {
     if ((i + 1) < l->nitems)
       Printf(s, ", ");
   }
-  Printf(s, " ]\n");
+  Printf(s, " ]");
   ObjSetMark(lo, 0);
   return s;
 }

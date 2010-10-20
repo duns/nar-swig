@@ -336,7 +336,7 @@ typedef union YYSTYPE
   String       *str;
   Parm         *p;
   ParmList     *pl;
-  int           ivalue;
+  int           intvalue;
   Node         *node;
 }
 /* Line 1489 of yacc.c.  */

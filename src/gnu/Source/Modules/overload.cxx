@@ -13,7 +13,7 @@
  * building a dispatch function.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_overload_cxx[] = "$Id: overload.cxx 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_overload_cxx[] = "$Id: overload.cxx 12108 2010-06-10 01:13:31Z ianlancetaylor $";
 
 #include "swigmod.h"
 
@@ -59,7 +59,7 @@ void Wrapper_cast_dispatch_mode_set(int flag) {
  * languages ignore the first method parsed.
  * ----------------------------------------------------------------------------- */
 
-static List *Swig_overload_rank(Node *n, bool script_lang_wrapping) {
+List *Swig_overload_rank(Node *n, bool script_lang_wrapping) {
   Overloaded nodes[MAX_OVERLOAD];
   int nnodes = 0;
   Node *o = Getattr(n, "sym:overloaded");

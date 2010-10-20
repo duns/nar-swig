@@ -12,7 +12,7 @@
  * parse trees.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_tree_c[] = "$Id: tree.c 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_tree_c[] = "$Id: tree.c 12219 2010-09-14 18:50:04Z wsfulton $";
 
 #include "swig.h"
 #include <stdarg.h>
@@ -291,10 +291,10 @@ void Swig_require(const char *ns, Node *n, ...) {
     if (view) {
       if (Strcmp(view, ns) != 0) {
 	Setattr(n, NewStringf("%s:view", ns), view);
-	Setattr(n, "view", ns);
+	Setattr(n, "view", NewString(ns));
       }
     } else {
-      Setattr(n, "view", ns);
+      Setattr(n, "view", NewString(ns));
     }
   }
 }
@@ -337,10 +337,10 @@ void Swig_save(const char *ns, Node *n, ...) {
     if (view) {
       if (Strcmp(view, ns) != 0) {
 	Setattr(n, NewStringf("%s:view", ns), view);
-	Setattr(n, "view", ns);
+	Setattr(n, "view", NewString(ns));
       }
     } else {
-      Setattr(n, "view", ns);
+      Setattr(n, "view", NewString(ns));
     }
   }
 }

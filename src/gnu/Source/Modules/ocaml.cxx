@@ -11,7 +11,7 @@
  * Ocaml language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_ocaml_cxx[] = "$Id: ocaml.cxx 12034 2010-05-21 07:10:12Z olly $";
+char cvsroot_ocaml_cxx[] = "$Id: ocaml.cxx 12137 2010-06-17 23:49:12Z wsfulton $";
 
 #include "swigmod.h"
 
@@ -1599,7 +1599,7 @@ public:
 	tm = Getattr(n, "feature:director:except");
       }
       if ((tm) && Len(tm) && (Strcmp(tm, "1") != 0)) {
-	Printf(w->code, "if (result == NULL) {\n");
+	Printf(w->code, "if (!result) {\n");
 	Printf(w->code, "  CAML_VALUE error = *caml_named_value(\"director_except\");\n");
 	Replaceall(tm, "$error", "error");
 	Printv(w->code, Str(tm), "\n", NIL);

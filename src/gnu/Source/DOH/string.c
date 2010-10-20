@@ -12,7 +12,7 @@
  *     file semantics.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_string_c[] = "$Id: string.c 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_string_c[] = "$Id: string.c 12167 2010-07-22 16:59:29Z vadz $";
 
 #include "dohint.h"
 
@@ -419,7 +419,7 @@ static int String_read(DOH *so, void *buffer, int len) {
 /* -----------------------------------------------------------------------------
  * int String_write() - Write data to a string
  * ----------------------------------------------------------------------------- */
-static int String_write(DOH *so, void *buffer, int len) {
+static int String_write(DOH *so, const void *buffer, int len) {
   int newlen;
   String *s = (String *) ObjData(so);
   s->hashkey = -1;

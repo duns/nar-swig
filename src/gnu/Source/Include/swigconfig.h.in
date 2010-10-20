@@ -15,11 +15,11 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define if you have PCRE library */
+#undef HAVE_PCRE
+
 /* Define if popen is available */
 #undef HAVE_POPEN
-
-/* Define if rxspencer is available */
-#undef HAVE_RXSPENCER
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

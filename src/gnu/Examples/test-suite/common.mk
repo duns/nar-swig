@@ -69,7 +69,7 @@ INCLUDES   = -I$(top_srcdir)/$(EXAMPLES)/$(TEST_SUITE)
 LIBS       = -L.
 LIBPREFIX  = lib
 ACTION     = check
-INTERFACEDIR = ../
+INTERFACEDIR = $(top_srcdir)/$(EXAMPLES)/$(TEST_SUITE)/
 
 #
 # Please keep test cases in alphabetical order.
@@ -180,6 +180,7 @@ CPP_TEST_CASES += \
 	disown \
 	dynamic_cast \
 	empty \
+	enum_rename \
 	enum_scope_template \
 	enum_template \
 	enum_thorough \
@@ -200,6 +201,7 @@ CPP_TEST_CASES += \
 	features \
 	fragments \
 	friends \
+	funcptr_cpp \
 	fvirtual \
 	global_namespace \
 	global_ns_arg \
@@ -282,6 +284,8 @@ CPP_TEST_CASES += \
 	rename4 \
 	rename_scope \
 	rename_strip_encoder \
+	rename_pcre_encoder \
+	rename_pcre_enum \
 	restrict_cplusplus \
 	return_const_value \
 	return_value_scope \
@@ -290,6 +294,7 @@ CPP_TEST_CASES += \
 	sizet \
 	smart_pointer_const \
 	smart_pointer_const2 \
+	smart_pointer_const_overload \
 	smart_pointer_extend \
 	smart_pointer_member \
 	smart_pointer_multi \
@@ -482,6 +487,7 @@ C_TEST_CASES += \
 	overload_extendc \
 	preproc \
 	preproc_constants_c \
+	preproc_line_file \
 	ret_by_value \
 	simple_array \
 	sizeof_pointer \

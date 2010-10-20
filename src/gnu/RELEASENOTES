@@ -1,9 +1,18 @@
+This file contains a brief overview of the changes made in each release.
+A detailed description of changes are available in the CHANGES.current
+and CHANGES files.
+
 Release Notes
 =============
 
-A detailed description of changes are available in the CHANGES.current
-and CHANGES files. The summaries below contain just a brief overview of
-the changes made in each release.
+SWIG-2.0.1 summary:
+- Support for the Go language has been added.
+- New regular expression (regex) encoder for renaming symbols based on
+  the Perl Compatible Regular Expressions (PCRE) library.
+- Numerous fixes in reporting file and line numbers in error and warning
+  messages.
+- Various bug fixes and improvements in the C#, Lua, Perl, PHP, Ruby
+  and Python language modules.
 
 SWIG-2.0.0 summary:
 - License changes, see LICENSE file and http://www.swig.org/legal.html.

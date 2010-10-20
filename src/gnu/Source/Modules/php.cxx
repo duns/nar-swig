@@ -37,7 +37,7 @@
  * (may need to add more WARN_PHP_xxx codes...)
  */
 
-char cvsroot_php_cxx[] = "$Id: php.cxx 12062 2010-05-27 20:55:24Z wsfulton $";
+char cvsroot_php_cxx[] = "$Id: php.cxx 12208 2010-09-08 02:40:56Z olly $";
 
 #include "swigmod.h"
 
@@ -915,8 +915,10 @@ public:
     }
 
     /* Insert argument output code */
+    bool hasargout = false;
     for (i = 0, p = l; p; i++) {
       if ((tm = Getattr(p, "tmap:argout"))) {
+	hasargout = true;
 	Replaceall(tm, "$source", Getattr(p, "lname"));
 	//      Replaceall(tm,"$input",Getattr(p,"lname"));
 	Replaceall(tm, "$target", "return_value");
@@ -1206,7 +1208,7 @@ public:
 	  }
 	  if (!pname_cstr) {
 	    // Unnamed parameter, e.g. int foo(int);
-	  } else if (pname == NULL) {
+	  } else if (!pname) {
 	    pname = NewString(pname_cstr);
 	  } else {
 	    size_t len = strlen(pname_cstr);
@@ -1290,7 +1292,7 @@ public:
 		if (errno || *p) {
 		  Clear(value);
 		  Append(value, "?");
-		} else if (strchr(Char(value), '.') == NULL) {
+		} else if (strchr(Char(value), '.') == 0) {
 		  // Ensure value is a double constant, not an integer one.
 		  Append(value, ".0");
 		  double val2 = strtod(Char(value), &p);
@@ -1575,14 +1577,21 @@ public:
 	  }
 	  if (Getattr(n, "access") && haspublicbase) {
 	    Delete(acc);
-	    acc = NewString("public");
+	    acc = NewStringEmpty(); // implicitly public
 	    Swig_warning(WARN_PHP_PUBLIC_BASE, input_file, line_number, Char(warnmsg));
 	    Delete(warnmsg);
 	  }
 	}
-	if (Cmp(acc, "") != 0) {
+
+	if (Cmp(acc, "public") == 0) {
+	  // The default visibility for methods is public, so don't specify
+	  // that explicitly to keep the wrapper size down.
+	  Delete(acc);
+	  acc = NewStringEmpty();
+	} else if (Cmp(acc, "") != 0) {
 	  Append(acc, " ");
 	}
+
 	if (constructor) {
 	  const char * arg0;
 	  if (max_num_of_arguments > 0) {
@@ -1656,7 +1665,7 @@ public:
 	  }
 	}
 	Printf(output, "%s", prepare);
-      } else if (Cmp(d, "void") == 0) {
+      } else if (Cmp(d, "void") == 0 && !hasargout) {
 	if (Cmp(invoke, "$r") != 0)
 	  Printf(output, "\t\t%s;\n", invoke);
       } else if (is_class(d)) {
@@ -1695,7 +1704,7 @@ public:
 	      Printf(output, "\t\t\treturn new $c($r);\n");
 	    } else {
 	      Printf(output, "\t\t\t$c = new stdClass();\n");
-	      Printf(output, "\t\t\t$c->_cPtr = $r;\n");
+	      Printf(output, "\t\t\t$c->"SWIG_PTR" = $r;\n");
 	      Printf(output, "\t\t\treturn $c;\n");
 	    }
 	    Printf(output, "\t\t}\n\t\treturn $r;\n");
@@ -2496,7 +2505,7 @@ done:
       idx = 0;
       p = l;
       int use_parse = 0;
-      while (p != NULL) {
+      while (p) {
 	if (checkAttribute(p, "tmap:in:numinputs", "0")) {
 	  p = Getattr(p, "tmap:in:next");
 	  continue;
@@ -2565,7 +2574,7 @@ done:
       }
       Append(w->code, "zval *result, funcname;\n");
       Append(w->code, "MAKE_STD_ZVAL(result);\n");
-      Printf(w->code, "ZVAL_STRING(&funcname, (char *)\"%s\", 0);\n", name);
+      Printf(w->code, "ZVAL_STRING(&funcname, (char *)\"%s\", 0);\n", GetChar(n, "sym:name"));
       Append(w->code, "if (!swig_self) {\n");
       Append(w->code, "  SWIG_PHP_Error(E_ERROR, \"this pointer is NULL\");");
       Append(w->code, "}\n\n");

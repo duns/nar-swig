@@ -41,6 +41,8 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/Tools/config/ac_compare_version.m4 \
 	$(top_srcdir)/Tools/config/ac_compile_warnings.m4 \
 	$(top_srcdir)/Tools/config/ac_define_dir.m4 \
+	$(top_srcdir)/Tools/config/ax_compare_version.m4 \
+	$(top_srcdir)/Tools/config/ax_path_generic.m4 \
 	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -61,23 +63,24 @@ am_eswig_OBJECTS = CParse/cscanner.$(OBJEXT) CParse/parser.$(OBJEXT) \
 	Modules/chicken.$(OBJEXT) Modules/clisp.$(OBJEXT) \
 	Modules/contract.$(OBJEXT) Modules/csharp.$(OBJEXT) \
 	Modules/directors.$(OBJEXT) Modules/emit.$(OBJEXT) \
-	Modules/guile.$(OBJEXT) Modules/java.$(OBJEXT) \
-	Modules/lang.$(OBJEXT) Modules/lua.$(OBJEXT) \
-	Modules/main.$(OBJEXT) Modules/modula3.$(OBJEXT) \
-	Modules/module.$(OBJEXT) Modules/mzscheme.$(OBJEXT) \
-	Modules/ocaml.$(OBJEXT) Modules/octave.$(OBJEXT) \
-	Modules/overload.$(OBJEXT) Modules/perl5.$(OBJEXT) \
-	Modules/php.$(OBJEXT) Modules/pike.$(OBJEXT) \
-	Modules/python.$(OBJEXT) Modules/r.$(OBJEXT) \
-	Modules/ruby.$(OBJEXT) Modules/s-exp.$(OBJEXT) \
-	Modules/swigmain.$(OBJEXT) Modules/tcl8.$(OBJEXT) \
-	Modules/typepass.$(OBJEXT) Modules/uffi.$(OBJEXT) \
-	Modules/utils.$(OBJEXT) Modules/xml.$(OBJEXT) \
-	Preprocessor/cpp.$(OBJEXT) Preprocessor/expr.$(OBJEXT) \
-	Swig/cwrap.$(OBJEXT) Swig/deprecate.$(OBJEXT) \
-	Swig/error.$(OBJEXT) Swig/fragment.$(OBJEXT) \
-	Swig/getopt.$(OBJEXT) Swig/include.$(OBJEXT) \
-	Swig/misc.$(OBJEXT) Swig/naming.$(OBJEXT) Swig/parms.$(OBJEXT) \
+	Modules/go.$(OBJEXT) Modules/guile.$(OBJEXT) \
+	Modules/java.$(OBJEXT) Modules/lang.$(OBJEXT) \
+	Modules/lua.$(OBJEXT) Modules/main.$(OBJEXT) \
+	Modules/modula3.$(OBJEXT) Modules/module.$(OBJEXT) \
+	Modules/mzscheme.$(OBJEXT) Modules/ocaml.$(OBJEXT) \
+	Modules/octave.$(OBJEXT) Modules/overload.$(OBJEXT) \
+	Modules/perl5.$(OBJEXT) Modules/php.$(OBJEXT) \
+	Modules/pike.$(OBJEXT) Modules/python.$(OBJEXT) \
+	Modules/r.$(OBJEXT) Modules/ruby.$(OBJEXT) \
+	Modules/s-exp.$(OBJEXT) Modules/swigmain.$(OBJEXT) \
+	Modules/tcl8.$(OBJEXT) Modules/typepass.$(OBJEXT) \
+	Modules/uffi.$(OBJEXT) Modules/utils.$(OBJEXT) \
+	Modules/xml.$(OBJEXT) Preprocessor/cpp.$(OBJEXT) \
+	Preprocessor/expr.$(OBJEXT) Swig/cwrap.$(OBJEXT) \
+	Swig/deprecate.$(OBJEXT) Swig/error.$(OBJEXT) \
+	Swig/fragment.$(OBJEXT) Swig/getopt.$(OBJEXT) \
+	Swig/include.$(OBJEXT) Swig/misc.$(OBJEXT) \
+	Swig/naming.$(OBJEXT) Swig/parms.$(OBJEXT) \
 	Swig/scanner.$(OBJEXT) Swig/stype.$(OBJEXT) \
 	Swig/symbol.$(OBJEXT) Swig/tree.$(OBJEXT) \
 	Swig/typeobj.$(OBJEXT) Swig/typemap.$(OBJEXT) \
@@ -146,6 +149,8 @@ EXEEXT = @EXEEXT@
 EXTRA_CLEAN = @EXTRA_CLEAN@
 GCJ = @GCJ@
 GCJH = @GCJH@
+GO = @GO@
+GOGCC = @GOGCC@
 GREP = @GREP@
 GUILE = @GUILE@
 GUILEINCLUDE = @GUILEINCLUDE@
@@ -211,6 +216,9 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PCRE_CFLAGS = @PCRE_CFLAGS@
+PCRE_CONFIG = @PCRE_CONFIG@
+PCRE_LIBS = @PCRE_LIBS@
 PERL = @PERL@
 PERL5CCFLAGS = @PERL5CCFLAGS@
 PERL5DYNAMICLINKING = @PERL5DYNAMICLINKING@
@@ -247,6 +255,7 @@ RUBYDYNAMICLINKING = @RUBYDYNAMICLINKING@
 RUBYINCLUDE = @RUBYINCLUDE@
 RUBYLIB = @RUBYLIB@
 RUBYLINK = @RUBYLINK@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SKIP_ALLEGROCL = @SKIP_ALLEGROCL@
@@ -255,6 +264,7 @@ SKIP_CHICKEN = @SKIP_CHICKEN@
 SKIP_CLISP = @SKIP_CLISP@
 SKIP_CSHARP = @SKIP_CSHARP@
 SKIP_GCJ = @SKIP_GCJ@
+SKIP_GO = @SKIP_GO@
 SKIP_GUILE = @SKIP_GUILE@
 SKIP_GUILESCM = @SKIP_GUILESCM@
 SKIP_JAVA = @SKIP_JAVA@
@@ -385,6 +395,7 @@ eswig_SOURCES = CParse/cscanner.c		\
 		Modules/csharp.cxx		\
 		Modules/directors.cxx		\
 		Modules/emit.cxx		\
+		Modules/go.cxx			\
 		Modules/guile.cxx		\
 		Modules/java.cxx		\
 		Modules/lang.cxx		\
@@ -439,7 +450,7 @@ CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 # Compiling with -DNDEBUG and no optimisations will allow one to do a binary diff of the
 # swig executable as a way of checking before and after the 'beautifying'.
 # Single files can be beautified with the beautify-file target, eg: 'make beautify-file INDENTFILE=chosenfile.c'
-SWIGTYPEDEFS = -T File -T DohObjInfo -T Parm -T Language -T List -T Typetab -T ModuleFactory -T ErrorMessageFormat -T Symtab -T Hash -T String -T DohBase -T Node -T String_or_char -T SwigType -T Dispatcher -T Wrapper -T DohStringMethods -T DohFileMethods -T DohListMethods -T DohHashMethods -T DOH -T DohIterator -T ParmList -T FILE -T HashNode -T DOHString_or_char
+SWIGTYPEDEFS = -T bool -T File -T DohObjInfo -T Parm -T Language -T List -T Typetab -T ModuleFactory -T ErrorMessageFormat -T Symtab -T Hash -T String -T DohBase -T Node -T String_or_char -T SwigType -T Dispatcher -T Wrapper -T DohStringMethods -T DohFileMethods -T DohListMethods -T DohHashMethods -T DOH -T DohIterator -T ParmList -T FILE -T HashNode -T DOHString_or_char
 INDENTBAKSDIR = ../IndentBaks
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -558,6 +569,8 @@ Modules/csharp.$(OBJEXT): Modules/$(am__dirstamp) \
 Modules/directors.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/emit.$(OBJEXT): Modules/$(am__dirstamp) \
+	Modules/$(DEPDIR)/$(am__dirstamp)
+Modules/go.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/guile.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
@@ -685,6 +698,7 @@ mostlyclean-compile:
 	-rm -f Modules/csharp.$(OBJEXT)
 	-rm -f Modules/directors.$(OBJEXT)
 	-rm -f Modules/emit.$(OBJEXT)
+	-rm -f Modules/go.$(OBJEXT)
 	-rm -f Modules/guile.$(OBJEXT)
 	-rm -f Modules/java.$(OBJEXT)
 	-rm -f Modules/lang.$(OBJEXT)
@@ -754,6 +768,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/csharp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/directors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/emit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/go.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/guile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/java.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/lang.Po@am__quote@

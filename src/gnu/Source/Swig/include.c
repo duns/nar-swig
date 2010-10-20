@@ -13,7 +13,7 @@
  * are provided.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_include_c[] = "$Id: include.c 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_include_c[] = "$Id: include.c 12211 2010-09-10 06:08:45Z wsfulton $";
 
 #include "swig.h"
 
@@ -221,6 +221,8 @@ String *Swig_read_file(FILE *f) {
     Append(str, buffer);
   }
   len = Len(str);
+  /* Add a newline if not present on last line -- the preprocessor seems to 
+   * rely on \n and not EOF terminating lines */
   if (len) {
     char *cstr = Char(str);
     if (cstr[len - 1] != '\n') {

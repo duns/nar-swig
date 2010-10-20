@@ -11,7 +11,7 @@
  * Perl5 language module for SWIG.
  * ------------------------------------------------------------------------- */
 
-char cvsroot_perl5_cxx[] = "$Id: perl5.cxx 11945 2010-03-13 23:08:02Z wsfulton $";
+char cvsroot_perl5_cxx[] = "$Id: perl5.cxx 12137 2010-06-17 23:49:12Z wsfulton $";
 
 #include "swigmod.h"
 #include "cparse.h"
@@ -308,7 +308,7 @@ public:
     if (no_pmfile) {
       f_pm = NewString(0);
     } else {
-      if (pmfile == NULL) {
+      if (!pmfile) {
 	char *m = Char(module) + Len(module);
 	while (m != Char(module)) {
 	  if (*m == ':') {

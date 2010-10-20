@@ -11,7 +11,7 @@
  * ALLEGROCL language module for SWIG.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_allegrocl_cxx[] = "$Id: allegrocl.cxx 11935 2010-03-10 19:38:24Z mutandiz $";
+char cvsroot_allegrocl_cxx[] = "$Id: allegrocl.cxx 12108 2010-06-10 01:13:31Z ianlancetaylor $";
 
 #include "swigmod.h"
 #include "cparse.h"
@@ -1708,6 +1708,8 @@ int ALLEGROCL::top(Node *n) {
    keeps the below Swig_overload_rank() code to itself.
    We don't need a dispatch function in the C++ wrapper
    code; we want it over on the lisp side. */
+
+#define Swig_overload_rank Allegrocl_swig_overload_rank
 
 #define MAX_OVERLOAD 256
 

@@ -12,7 +12,7 @@
  *     ordinary FILE * or integer file descriptor.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_file_c[] = "$Id: file.c 11876 2010-02-27 23:53:33Z wsfulton $";
+char cvsroot_file_c[] = "$Id: file.c 12167 2010-07-22 16:59:29Z vadz $";
 
 #include "dohint.h"
 
@@ -67,7 +67,7 @@ static int File_read(DOH *fo, void *buffer, int len) {
  * File_write()
  * ----------------------------------------------------------------------------- */
 
-static int File_write(DOH *fo, void *buffer, int len) {
+static int File_write(DOH *fo, const void *buffer, int len) {
   DohFile *f = (DohFile *) ObjData(fo);
   if (f->filep) {
     int ret = (int) fwrite(buffer, 1, len, f->filep);
